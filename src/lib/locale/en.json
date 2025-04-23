@@ -1,0 +1,35 @@
+{
+  "common": {
+    "welcome": "Welcome to Certificate Blockchain",
+    "dashboard": "Dashboard",
+    "certificates": "Certificates",
+    "users": {
+      "title": "Users",
+      "students": "Students",
+      "teachers": "Teachers",
+      "administrators": "Administrators"
+    },
+    "organizations": {
+      "title": "Organizations",
+      "schools": "Schools",
+      "universities": "Universities"
+    },
+    "documents": "Documents",
+    "settings": "Settings",
+    "logout": "Logout",
+    "profile": "Profile",
+    "language": "Language"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?"
+  },
+  "dashboard": {
+    "totalCertificates": "Total Certificates",
+    "pendingApprovals": "Pending Approvals",
+    "recentActivity": "Recent Activity"
+  }
+}

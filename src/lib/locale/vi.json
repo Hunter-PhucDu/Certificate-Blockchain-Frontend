@@ -1,0 +1,35 @@
+{
+  "common": {
+    "welcome": "Chào mừng đến với Certificate Blockchain",
+    "dashboard": "Bảng điều khiển",
+    "certificates": "Chứng chỉ",
+    "users": {
+      "title": "Người dùng",
+      "students": "Học sinh",
+      "teachers": "Giáo viên",
+      "administrators": "Quản trị viên"
+    },
+    "organizations": {
+      "title": "Tổ chức",
+      "schools": "Trường học",
+      "universities": "Đại học"
+    },
+    "documents": "Tài liệu",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "language": "Ngôn ngữ"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?"
+  },
+  "dashboard": {
+    "totalCertificates": "Tổng số chứng chỉ",
+    "pendingApprovals": "Chờ phê duyệt",
+    "recentActivity": "Hoạt động gần đây"
+  }
+}
