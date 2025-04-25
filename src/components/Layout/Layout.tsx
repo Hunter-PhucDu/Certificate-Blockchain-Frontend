@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout as AntLayout, Breadcrumb } from "antd";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -11,6 +11,8 @@ import {
   shadows,
   tokens,
 } from "@/config/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
+import { setupInactivityLogout } from "@/lib/inactivity";
 
 const { Content, Footer } = AntLayout;
 
@@ -20,12 +22,24 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { isDarkMode } = useTheme();
 
+  const { isDarkMode } = useTheme();
   const themeColors = isDarkMode ? darkThemeColors : lightThemeColors;
   const currentShadow = isDarkMode ? shadows.dark.small : shadows.light.small;
 
   const breadcrumbItems = [{ title: "Home" }, { title: "Dashboard" }];
+
+  const logout = useAuthStore((state) => state.clearAuth);
+
+  useEffect(() => {
+    const cleanupIdle = setupInactivityLogout(() => {
+      alert("Không hoạt động 30 phút. Đăng xuất.");
+      logout();
+    });
+    return () => {
+      cleanupIdle();
+    };
+  }, [logout]);
 
   return (
     <AntLayout style={{ minHeight: "100vh" }}>

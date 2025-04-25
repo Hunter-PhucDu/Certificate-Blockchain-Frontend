@@ -21,6 +21,7 @@ import {
 import { languages } from "@/lib/i18n/settings";
 import { useTranslation } from "react-i18next";
 import { useLanguageStore } from "@/stores/languageStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const { Header: AntHeader } = Layout;
 const { useToken } = theme;
@@ -43,6 +44,12 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
     setLanguage(newLocale);
   };
 
+  const { clearAuth } = useAuthStore();
+  const handleLogout = () => {
+    // Theme reset is now handled in the clearAuth function
+    clearAuth();
+  };
+
   const userMenuItems: MenuProps["items"] = [
     {
       key: "profile",
@@ -59,6 +66,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
       key: "logout",
       label: t("common.logout"),
       danger: true,
+      onClick: handleLogout,
     },
   ];
 

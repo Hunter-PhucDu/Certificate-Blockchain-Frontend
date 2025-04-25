@@ -1,6 +1,6 @@
 export function setupInactivityLogout(
   onLogout: () => void,
-  timeout = 30 * 60 * 1000,
+  timeout = 30 * 60 * 1000, // 30 minutes
 ) {
   let timer: NodeJS.Timeout;
   const events = ["click", "keydown", "mousemove", "scroll", "touchstart"];

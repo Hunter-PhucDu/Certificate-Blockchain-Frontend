@@ -8,9 +8,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { darkThemeColors, lightThemeColors } from "@/config/constants/theme";
 import { ThemeProvider as AntdThemeProvider } from "antd-style";
 
-import { useAuthStore } from "@/stores/authStore";
-import { acquireTabLock, releaseTabLock } from "@/lib/singleTab";
-import { setupInactivityLogout } from "@/lib/inactivity";
+const THEME_RESET_EVENT = "theme-reset";
+export const resetThemeToLight = () => {
+  window.dispatchEvent(new Event(THEME_RESET_EVENT));
+  localStorage.setItem("theme", "light");
+  document.body.classList.add("light-theme");
+  document.body.classList.remove("dark-theme");
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,10 +48,6 @@ const ThemeContext = createContext<ThemeContextType>({
 export const useTheme = () => useContext(ThemeContext);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const initializeAuth = useAuthStore((state) => state.initializeFromStorage);
-
-  const logout = useAuthStore((state) => state.clearAuth);
-
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const currentTheme = isDarkMode ? darkThemeColors : lightThemeColors;
@@ -61,6 +61,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
       setIsDarkMode(true);
     }
+
+    // Listen for theme reset events
+    const handleThemeReset = () => {
+      setIsDarkMode(false);
+    };
+
+    window.addEventListener(THEME_RESET_EVENT, handleThemeReset);
+
+    return () => {
+      window.removeEventListener(THEME_RESET_EVENT, handleThemeReset);
+    };
   }, []);
 
   useEffect(() => {
@@ -74,24 +85,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       document.body.classList.remove("dark-theme");
     }
   }, [isDarkMode]);
-
-  useEffect(() => {
-    initializeAuth();
-    acquireTabLock(() => {
-      alert("Chỉ được mở một tab. Đăng xuất.");
-      logout();
-    });
-    window.addEventListener("beforeunload", releaseTabLock);
-    const cleanupIdle = setupInactivityLogout(() => {
-      alert("Không hoạt động 30 phút. Đăng xuất.");
-      logout();
-    });
-    return () => {
-      releaseTabLock();
-      window.removeEventListener("beforeunload", releaseTabLock);
-      cleanupIdle();
-    };
-  }, [initializeAuth, logout]);
 
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);

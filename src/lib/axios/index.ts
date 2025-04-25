@@ -1,105 +1,77 @@
-/**
- * API service layer for making HTTP requests using Axios
- */
-import axios, {
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosError,
-} from "axios";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from "axios";
+import { useAuthStore } from "@/stores/authStore";
 import { HTTP_STATUS } from "@/config/constants/httpStatus";
 
-// Define interface for API error responses
-interface ApiErrorResponse {
-  message?: string;
-  error?: string;
-  statusCode?: number;
-  // Add other potential error fields your API might return
-}
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.example.com";
-
-/**
- * Create a configured Axios instance
- */
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 10000, // 10 seconds
+  headers: { "Content-Type": "application/json" },
+  timeout: 10000,
 });
 
-/**
- * Request interceptor for API calls
- */
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // You can add auth tokens here
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.error("Request error:", error);
-    return Promise.reject(error);
-  },
-);
+let isRefreshing = false;
+let queue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: any) => void;
+}> = [];
 
-/**
- * Response interceptor for API calls
- */
+const processQueue = (error: any, token: string | null = null) => {
+  queue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
+  queue = [];
+};
+
+axiosInstance.interceptors.request.use((cfg) => {
+  const at = useAuthStore.getState().accessToken;
+  if (at) cfg.headers.Authorization = `Bearer ${at}`;
+  return cfg;
+});
+
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => {
-    // You can do global response handling here
-    return response;
-  },
-  (error: AxiosError) => {
-    const { response } = error;
-
-    // Handle different error statuses
-    if (response) {
-      const status = response.status;
-
-      // Handle specific status codes
-      switch (status) {
-        case HTTP_STATUS.UNAUTHORIZED:
-          console.error("Unauthorized access");
-          // You can redirect to login or refresh token here
-          break;
-        case HTTP_STATUS.FORBIDDEN:
-          console.error("Forbidden access");
-          break;
-        case HTTP_STATUS.NOT_FOUND:
-          console.error("Resource not found");
-          break;
-        case HTTP_STATUS.INTERNAL_SERVER_ERROR:
-          console.error("Server error");
-          break;
-        default:
-          console.error(`API error: ${status}`);
+  (res) => res,
+  (err: AxiosError & { config?: any }) => {
+    const auth = useAuthStore.getState();
+    const req = err.config!;
+    if (err.response?.status === HTTP_STATUS.UNAUTHORIZED && !req._retry) {
+      if (isRefreshing) {
+        return new Promise<any>((resolve, reject) => {
+          queue.push({ resolve, reject });
+        }).then((t: unknown) => {
+          const token = t as string;
+          req.headers["Authorization"] = `Bearer ${token}`;
+          return axiosInstance(req);
+        });
       }
 
-      // Extract error message from response if available
-      const errorData = response.data as ApiErrorResponse;
-      const errorMessage = errorData.message || `API error: ${status}`;
-      return Promise.reject(new Error(errorMessage));
-    }
+      req._retry = true;
+      isRefreshing = true;
 
-    // Handle network errors or other issues
-    if (error.message === "Network Error") {
-      console.error("Network error - make sure API is running");
+      return new Promise<any>((resolve, reject) => {
+        axiosInstance
+          .post("/auth/refresh", { refreshToken: auth.refreshToken })
+          .then(({ data }) => {
+            const { accessToken, refreshToken } = data;
+            auth.setTokens(accessToken, refreshToken);
+            processQueue(null, accessToken);
+            req.headers["Authorization"] = `Bearer ${accessToken}`;
+            resolve(axiosInstance(req));
+          })
+          .catch((e) => {
+            processQueue(e, null);
+            auth.clearAuth();
+            window.location.href = "/login";
+            reject(e);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      });
     }
-
-    return Promise.reject(error);
+    return Promise.reject(err);
   },
 );
 
-/**
- * API service with methods for different request types
- */
 export const apiService = {
   /**
    * GET request

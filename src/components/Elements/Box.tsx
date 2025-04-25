@@ -1,3 +1,5 @@
+"use client";
+
 import { JSX } from "react";
 import { useTheme } from "@/providers/Provider";
 
@@ -11,6 +13,7 @@ type BoxProps = {
   disabled?: boolean;
   themeBackground?: string;
   themeColor?: string;
+  sx?: object;
 };
 
 export const Box = (props: BoxProps) => {

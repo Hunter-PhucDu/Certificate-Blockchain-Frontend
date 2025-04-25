@@ -7,7 +7,7 @@ import {
   UseMutationOptions,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { apiService as axiosService } from "../../lib/axios";
+import { apiService as axiosService } from "@/lib/axios";
 import { ApiResponse, PaginatedResponse, QueryFilterOptions } from "./types";
 
 /**
