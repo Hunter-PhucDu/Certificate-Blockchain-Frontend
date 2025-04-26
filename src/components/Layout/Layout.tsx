@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout as AntLayout, Breadcrumb } from "antd";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -10,7 +10,9 @@ import {
   darkThemeColors,
   shadows,
   tokens,
-} from "@/configs/theme";
+} from "@/config/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
+import { setupInactivityLogout } from "@/lib/inactivity";
 
 const { Content, Footer } = AntLayout;
 
@@ -20,14 +22,24 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { isDarkMode } = useTheme();
 
-  // Choose theme colors based on current mode
+  const { isDarkMode } = useTheme();
   const themeColors = isDarkMode ? darkThemeColors : lightThemeColors;
   const currentShadow = isDarkMode ? shadows.dark.small : shadows.light.small;
 
-  // Define breadcrumb items with the new items prop format
   const breadcrumbItems = [{ title: "Home" }, { title: "Dashboard" }];
+
+  const logout = useAuthStore((state) => state.clearAuth);
+
+  useEffect(() => {
+    const cleanupIdle = setupInactivityLogout(() => {
+      alert("Không hoạt động 30 phút. Đăng xuất.");
+      logout();
+    });
+    return () => {
+      cleanupIdle();
+    };
+  }, [logout]);
 
   return (
     <AntLayout style={{ minHeight: "100vh" }}>
@@ -36,7 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         style={{
           marginLeft: collapsed ? 80 : 200,
           transition: "all 0.2s",
-          background: themeColors.layout.content,
+          background: themeColors.background.default,
         }}
       >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -52,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             style={{
               padding: tokens.spacing.lg,
               minHeight: "calc(100vh - 180px)",
-              background: themeColors.background.primary,
+              background: themeColors.background.paper,
               borderRadius: tokens.borderRadius.lg,
               boxShadow: currentShadow,
               color: themeColors.text.primary,
@@ -65,8 +77,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Footer
           style={{
             textAlign: "center",
-            background: themeColors.layout.footer,
-            color: themeColors.text.secondary,
           }}
         >
           Certificate Blockchain ©{new Date().getFullYear()}

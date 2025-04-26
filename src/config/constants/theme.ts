@@ -1,15 +1,11 @@
-// Color palette configuration for the entire application
-// These tokens will be used throughout the application for consistent theming
-
-// Base colors - Professional blue-based palette
 export const baseColors = {
   primary: {
-    main: "#1890ff", // Ant Design's default blue
+    main: "#1890ff",
     light: "#40a9ff",
     dark: "#096dd9",
   },
   secondary: {
-    main: "#722ed1", // Purple for accent
+    main: "#722ed1",
     light: "#9254de",
     dark: "#531dab",
   },
@@ -35,10 +31,12 @@ export const baseColors = {
   },
 };
 
-// Light theme colors - Clean and professional
 export const lightThemeColors = {
   background: {
-    primary: "#ffffff",
+    default: "#f4f7fe",
+    paper: "#ffffff",
+    primary: "#1976d2",
+    sidebar: "#ffffff",
     secondary: "#f7f7f7",
     tertiary: "#f0f2f5",
   },
@@ -52,21 +50,14 @@ export const lightThemeColors = {
     light: "#f0f0f0",
     dark: "#d0d0d0",
   },
-  layout: {
-    // Clean white header with slight shadow for depth
-    header: "#ffffff",
-    // Popular indigo-shade for sidebar - widely used in admin dashboards
-    sidebar: "#001529",
-    sidebarCollapsed: "#001529",
-    content: "#f0f2f5",
-    footer: "#f7f7f7",
-  },
 };
 
-// Dark theme colors - Modern dark theme (GitHub Dark inspired)
 export const darkThemeColors = {
   background: {
-    primary: "#1e1e1e", // Slightly lighter than pure black
+    default: "#1f2527",
+    paper: "#2b3137",
+    primary: "#90caf9",
+    sidebar: "#313541",
     secondary: "#252525",
     tertiary: "#2d2d2d",
   },
@@ -80,18 +71,8 @@ export const darkThemeColors = {
     light: "#555555",
     dark: "#333333",
   },
-  layout: {
-    // Dark gray header (GitHub-like)
-    header: "#24292e",
-    // Rich dark blue sidebar with better contrast against header
-    sidebar: "#0d1117",
-    sidebarCollapsed: "#0d1117",
-    content: "#1e1e1e",
-    footer: "#24292e",
-  },
 };
 
-// Shadow configuration for both themes
 export const shadows = {
   light: {
     small: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
@@ -109,7 +90,6 @@ export const shadows = {
   },
 };
 
-// Other design tokens
 export const tokens = {
   borderRadius: {
     sm: 2,

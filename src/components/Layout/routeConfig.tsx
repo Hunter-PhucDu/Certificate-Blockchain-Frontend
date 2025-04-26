@@ -10,7 +10,7 @@ import {
   DesktopOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
-import { useTranslations } from "@/lib/i18n/translations";
+import { useTranslation } from "react-i18next";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -41,7 +41,7 @@ function getItem(
 }
 
 export const useMenuItems = (): MenuItem[] => {
-  const { t } = useTranslations();
+  const { t } = useTranslation();
 
   return [
     getItem(t("common.dashboard"), "1", "/home", <PieChartOutlined />),

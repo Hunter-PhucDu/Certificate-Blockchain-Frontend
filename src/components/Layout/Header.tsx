@@ -12,15 +12,16 @@ import {
 import { Button, Layout, Avatar, Space, Dropdown, theme } from "antd";
 import type { MenuProps } from "antd";
 import { useTheme } from "@/providers/Provider";
-import { useLocale } from "@/providers/LocaleContext";
 import {
   baseColors,
   lightThemeColors,
   darkThemeColors,
   shadows,
-} from "@/configs/theme";
-import { useTranslations } from "@/lib/i18n/translations";
-import { localeNames, Locale } from "@/lib/i18n/config";
+} from "@/config/constants/theme";
+import { languages } from "@/lib/i18n/settings";
+import { useTranslation } from "react-i18next";
+import { useLanguageStore } from "@/stores/languageStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const { Header: AntHeader } = Layout;
 const { useToken } = theme;
@@ -31,13 +32,23 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
+  const { t } = useTranslation();
+  const { currentLanguage, setLanguage } = useLanguageStore();
   const { isDarkMode, toggleTheme } = useTheme();
-  const { locale, setLocale } = useLocale();
-  const { t } = useTranslations();
   const { token } = useToken();
 
   const themeColors = isDarkMode ? darkThemeColors : lightThemeColors;
   const currentShadow = isDarkMode ? shadows.dark.small : shadows.light.small;
+
+  const handleLanguageChange = (newLocale: string) => {
+    setLanguage(newLocale);
+  };
+
+  const { clearAuth } = useAuthStore();
+  const handleLogout = () => {
+    // Theme reset is now handled in the clearAuth function
+    clearAuth();
+  };
 
   const userMenuItems: MenuProps["items"] = [
     {
@@ -55,24 +66,22 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
       key: "logout",
       label: t("common.logout"),
       danger: true,
+      onClick: handleLogout,
     },
   ];
 
-  const languageMenuItems: MenuProps["items"] = Object.entries(localeNames).map(
-    ([localeKey, localeName]) => ({
-      key: localeKey,
-      label: localeName,
-      onClick: () => setLocale(localeKey as Locale),
-      className: locale === localeKey ? "ant-dropdown-menu-item-active" : "",
-    }),
-  );
+  const languageMenuItems: MenuProps["items"] = languages.map((locale) => ({
+    key: locale,
+    label: locale.toUpperCase(),
+    onClick: () => handleLanguageChange(locale),
+    className:
+      locale === currentLanguage ? "ant-dropdown-menu-item-active" : "",
+  }));
 
   return (
     <AntHeader
       style={{
         padding: 0,
-        background: themeColors.layout.header,
-        color: themeColors.text.primary,
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -109,7 +118,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             {t("common.welcome")}
           </span>
 
-          {/* Language Switcher */}
           <Dropdown menu={{ items: languageMenuItems }} placement="bottomRight">
             <Button
               type="text"
@@ -121,7 +129,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             />
           </Dropdown>
 
-          {/* Theme Switcher */}
           <Button
             type="text"
             icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
@@ -132,7 +139,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             }}
           />
 
-          {/* User Menu */}
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <Avatar
               style={{
