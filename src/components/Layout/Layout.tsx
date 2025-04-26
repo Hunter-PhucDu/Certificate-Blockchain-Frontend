@@ -63,7 +63,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div
             style={{
               padding: tokens.spacing.lg,
-              minHeight: "calc(100vh - 180px)",
               background: themeColors.background.paper,
               borderRadius: tokens.borderRadius.lg,
               boxShadow: currentShadow,

@@ -40,19 +40,18 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       <Box
         themeColor="text.primary"
         style={{
-          height: 32,
+          height: 48,
           margin: 16,
           borderRadius: 6,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: collapsed ? "center" : "flex-start",
           fontWeight: "bold",
           overflow: "hidden",
-          letterSpacing: collapsed ? 0 : 1,
+          padding: collapsed ? "0 8px" : "0 16px",
         }}
       >
-        {!collapsed && <UserInfo />}
-        {collapsed && "C"}
+        <UserInfo collapsed={collapsed} />
       </Box>
       <Menu
         mode="inline"

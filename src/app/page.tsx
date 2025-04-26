@@ -24,7 +24,7 @@ export default function Page() {
         router.push("/home");
       } else {
         console.log("RootPage: redirecting to login");
-        router.push("/login");
+        router.push("/admin-login");
       }
     }
   }, [isAuthenticated, isLoading, router]);

@@ -1,7 +1,7 @@
 "use client";
 
-import SignIn from "@/features/auth/login/Login";
+import OrganizationLogin from "@/features/auth/organization-login/OrganizationLogin";
 
-export default function LoginPage() {
-  return <SignIn />;
+export default function OrganizationLoginPage() {
+  return <OrganizationLogin />;
 }

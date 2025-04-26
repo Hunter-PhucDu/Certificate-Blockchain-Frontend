@@ -3,11 +3,10 @@
 import { apiService } from "@/lib/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Types
 interface User {
   id: string;
-  email: string;
-  name: string;
+  email?: string;
+  username: string;
   role: string;
   createdAt: string;
   updatedAt: string;
