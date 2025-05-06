@@ -3,6 +3,7 @@
     "welcome": "Chào mừng đến với Certificate Blockchain",
     "dashboard": "Bảng điều khiển",
     "certificates": "Chứng chỉ",
+    "logManagement": "Quản lý nhật ký",
     "users": {
       "title": "Người dùng",
       "students": "Học sinh",
@@ -11,8 +12,8 @@
     },
     "organizations": {
       "title": "Tổ chức",
-      "schools": "Trường học",
-      "universities": "Đại học"
+      "list": "Danh sách tổ chức",
+      "create": "Tạo tổ chức"
     },
     "documents": "Tài liệu",
     "settings": "Cài đặt",
@@ -31,5 +32,19 @@
     "totalCertificates": "Tổng số chứng chỉ",
     "pendingApprovals": "Chờ phê duyệt",
     "recentActivity": "Hoạt động gần đây"
+  },
+  "logs": {
+    "title": "Nhật ký hệ thống",
+    "username": "Tên người dùng",
+    "action": "Hành động",
+    "payload": "Dữ liệu",
+    "role": "Vai trò",
+    "timestamp": "Thời gian",
+    "search": "Tìm kiếm theo hành động",
+    "noData": "Không tìm thấy nhật ký",
+    "exportCSV": "Xuất CSV",
+    "exporting": "Đang xuất nhật ký...",
+    "exportSuccess": "Xuất nhật ký thành công",
+    "exportError": "Xuất nhật ký thất bại"
   }
 }

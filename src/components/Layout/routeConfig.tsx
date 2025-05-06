@@ -12,6 +12,7 @@ import {
   KeyOutlined,
   AppstoreOutlined,
   BankOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
@@ -50,31 +51,24 @@ export const useMenuItems = (): MenuItem[] => {
   // Common menu items for all users
   const commonItems = [
     getItem(t("common.dashboard"), "dashboard", "/home", <PieChartOutlined />),
-    getItem(
-      t("common.certificates"),
-      "certificates",
-      "/certificates",
-      <DesktopOutlined />,
-    ),
     getItem(t("common.settings"), "settings", "/settings", <SettingOutlined />),
-    getItem(
-      t("common.changePassword"),
-      "change-password",
-      "/change-password",
-      <KeyOutlined />,
-    ),
   ];
 
-  // Admin-specific menu items
+  // Admin-specific menu items (for both SUPER_ADMIN and ADMIN)
   const adminItems = [
     ...commonItems,
+    getItem(
+      t("common.logManagement"),
+      "logs",
+      "/log-management",
+      <HistoryOutlined />,
+    ),
     getItem(t("common.users.title"), "users", "", <UserOutlined />, [
       getItem(
         t("common.users.administrators"),
         "admins",
         "/users/administrators",
       ),
-      getItem(t("common.users.organizations"), "orgs", "/users/organizations"),
     ]),
     getItem(
       t("common.organizations.title"),
@@ -100,12 +94,18 @@ export const useMenuItems = (): MenuItem[] => {
   // Organization-specific menu items
   const organizationItems = [
     ...commonItems,
+    getItem(
+      t("common.certificates"),
+      "certificates",
+      "/certificates",
+      <DesktopOutlined />,
+    ),
     getItem(t("common.groups"), "groups", "/groups", <AppstoreOutlined />),
     getItem(t("common.documents"), "documents", "/documents", <FileOutlined />),
   ];
 
   // Return appropriate menu items based on user role
-  if (userRole === "admin") {
+  if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") {
     return adminItems;
   }
 
@@ -121,10 +121,10 @@ export const sidebarRoutes = [
     icon: <PieChartOutlined />,
   },
   {
-    key: "certificates",
-    label: "common.certificates",
-    path: "/certificates",
-    icon: <DesktopOutlined />,
+    key: "logs",
+    label: "common.logManagement",
+    path: "/log-management",
+    icon: <HistoryOutlined />,
   },
   {
     key: "users",
@@ -136,12 +136,6 @@ export const sidebarRoutes = [
         key: "admins",
         label: "common.users.administrators",
         path: "/users/administrators",
-        icon: null,
-      },
-      {
-        key: "orgs",
-        label: "common.users.organizations",
-        path: "/users/organizations",
         icon: null,
       },
     ],
@@ -167,6 +161,12 @@ export const sidebarRoutes = [
     ],
   },
   {
+    key: "certificates",
+    label: "common.certificates",
+    path: "/certificates",
+    icon: <DesktopOutlined />,
+  },
+  {
     key: "groups",
     label: "common.groups",
     path: "/groups",
@@ -183,11 +183,5 @@ export const sidebarRoutes = [
     label: "common.settings",
     path: "/settings",
     icon: <SettingOutlined />,
-  },
-  {
-    key: "change-password",
-    label: "common.changePassword",
-    path: "/change-password",
-    icon: <KeyOutlined />,
   },
 ];
