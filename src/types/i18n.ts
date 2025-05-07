@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type en from "@/lib/i18n/locales/en/common.json";
+import type en from "@/lib/i18n/locales/en/en.json";
 
 type DefaultLocale = typeof en;
 export type TxKeyPath = RecursiveKeyOf<DefaultLocale>;

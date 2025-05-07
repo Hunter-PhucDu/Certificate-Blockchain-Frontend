@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { redirect } from "next/navigation";
 import Loader from "@/components/Elements/Loader";
 import { usePathname } from "next/navigation";
+import { App } from "antd";
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, initializeFromStorage, setLoading } =
@@ -28,5 +29,9 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
     redirect("/admin-login");
   }
 
-  return <Layout>{children}</Layout>;
+  return (
+    <App>
+      <Layout>{children}</Layout>
+    </App>
+  );
 }

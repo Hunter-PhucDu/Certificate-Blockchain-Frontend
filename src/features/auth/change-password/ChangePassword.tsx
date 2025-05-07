@@ -6,6 +6,7 @@ import { LockOutlined } from "@ant-design/icons";
 import { useChangePassword } from "@/services/AdminService";
 import { useToast } from "@/components/Elements/Toast";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
@@ -16,6 +17,7 @@ interface ChangePasswordForm {
 }
 
 const ChangePassword = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -23,7 +25,7 @@ const ChangePassword = () => {
 
   const onFinish = async (values: ChangePasswordForm) => {
     if (values.newPassword !== values.confirmPassword) {
-      toast.error("Mật khẩu mới không khớp");
+      toast.error(t("common.changePassword.passwordMismatch"));
       return;
     }
 
@@ -33,7 +35,7 @@ const ChangePassword = () => {
         password: values.password,
         newPassword: values.newPassword,
       });
-      toast.success("Đổi mật khẩu thành công");
+      toast.success(t("common.changePassword.success"));
       router.push("/auth/login");
     } catch (error: unknown) {
       const errorResponse = error as {
@@ -41,7 +43,7 @@ const ChangePassword = () => {
       };
       const errorMessage =
         errorResponse?.response?.data?.message ||
-        "Đổi mật khẩu thất bại, vui lòng thử lại.";
+        t("common.changePassword.error");
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -52,7 +54,7 @@ const ChangePassword = () => {
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-md">
         <Title level={2} className="text-center mb-8">
-          Đổi mật khẩu
+          {t("common.changePassword.title")}
         </Title>
         <Form
           name="change-password"
@@ -65,13 +67,13 @@ const ChangePassword = () => {
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập mật khẩu hiện tại",
+                message: t("common.changePassword.currentPasswordRequired"),
               },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Mật khẩu hiện tại"
+              placeholder={t("common.changePassword.currentPassword")}
               size="large"
             />
           </Form.Item>
@@ -81,17 +83,17 @@ const ChangePassword = () => {
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập mật khẩu mới",
+                message: t("common.changePassword.newPasswordRequired"),
               },
               {
                 min: 6,
-                message: "Mật khẩu phải có ít nhất 6 ký tự",
+                message: t("common.changePassword.passwordMinLength"),
               },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Mật khẩu mới"
+              placeholder={t("common.changePassword.newPassword")}
               size="large"
             />
           </Form.Item>
@@ -101,7 +103,7 @@ const ChangePassword = () => {
             rules={[
               {
                 required: true,
-                message: "Vui lòng xác nhận mật khẩu mới",
+                message: t("common.changePassword.confirmPasswordRequired"),
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
@@ -109,7 +111,7 @@ const ChangePassword = () => {
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error("Mật khẩu xác nhận không khớp"),
+                    new Error(t("common.changePassword.passwordMismatch")),
                   );
                 },
               }),
@@ -117,7 +119,7 @@ const ChangePassword = () => {
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Xác nhận mật khẩu mới"
+              placeholder={t("common.changePassword.confirmPassword")}
               size="large"
             />
           </Form.Item>
@@ -130,7 +132,7 @@ const ChangePassword = () => {
               size="large"
               loading={loading}
             >
-              Đổi mật khẩu
+              {t("common.changePassword.title")}
             </Button>
           </Form.Item>
         </Form>

@@ -4,8 +4,8 @@ import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import { fallbackLng, languages } from "@/lib/i18n/settings";
 
-import commonEN from "@/lib/i18n/locales/en/common.json";
-import commonVI from "@/lib/i18n/locales/vi/common.json";
+import commonEN from "@/lib/i18n/locales/en/en.json";
+import commonVI from "@/lib/i18n/locales/vi/vi.json";
 
 const getInitialLanguage = () => {
   if (typeof window !== "undefined") {

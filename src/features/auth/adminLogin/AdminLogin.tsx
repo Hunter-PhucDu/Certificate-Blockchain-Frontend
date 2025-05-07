@@ -253,10 +253,10 @@ const SignIn = () => {
           </Form.Item>
 
           <StyledRememberMe>
-            <Checkbox>{t("common.rememberMe")}</Checkbox>
+            <Checkbox>{"Remember Me"}</Checkbox>
 
             <StyledSignLink onClick={onGoToForgetPassword}>
-              {t("common.forgetPassword")}
+              {"Forget Password"}
             </StyledSignLink>
           </StyledRememberMe>
 
@@ -266,17 +266,8 @@ const SignIn = () => {
 
           <div className="form-btn-field">
             <SignInButton type="primary" htmlType="submit" size="large">
-              {t("common.login")}
+              {"Login"}
             </SignInButton>
-          </div>
-
-          <div className="form-field-action">
-            <StyledSignTextGrey>
-              {t("common.dontHaveAccount")}
-            </StyledSignTextGrey>
-            <StyledSignLinkTag href="/signup">
-              {t("common.signup")}
-            </StyledSignLinkTag>
           </div>
         </Form>
       </StyledCard>
