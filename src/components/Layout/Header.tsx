@@ -9,11 +9,10 @@ import {
   SunOutlined,
   GlobalOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Avatar, Space, Dropdown, theme } from "antd";
+import { Button, Layout, Space, Dropdown, theme } from "antd";
 import type { MenuProps } from "antd";
 import { useTheme } from "@/providers/Provider";
 import {
-  baseColors,
   lightThemeColors,
   darkThemeColors,
   shadows,
@@ -36,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
   const { currentLanguage, setLanguage } = useLanguageStore();
   const { isDarkMode, toggleTheme } = useTheme();
   const { token } = useToken();
+  const { user } = useAuthStore();
 
   const themeColors = isDarkMode ? darkThemeColors : lightThemeColors;
   const currentShadow = isDarkMode ? shadows.dark.small : shadows.light.small;
@@ -46,7 +46,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
 
   const { clearAuth } = useAuthStore();
   const handleLogout = () => {
-    // Theme reset is now handled in the clearAuth function
     clearAuth();
   };
 
@@ -115,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
               fontSize: "16px",
             }}
           >
-            {t("common.welcome")}
+            {user?.name && `${t("common.welcome")}, ${user.name}`}
           </span>
 
           <Dropdown menu={{ items: languageMenuItems }} placement="bottomRight">
@@ -140,13 +139,13 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
           />
 
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <Avatar
-              style={{
-                backgroundColor: baseColors.primary.main,
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
+            <Button
+              type="text"
               icon={<UserOutlined />}
+              style={{
+                fontSize: "16px",
+                color: token.colorPrimary,
+              }}
             />
           </Dropdown>
         </Space>

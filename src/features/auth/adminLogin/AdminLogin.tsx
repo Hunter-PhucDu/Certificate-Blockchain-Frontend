@@ -4,13 +4,14 @@
 import { useState, useEffect } from "react";
 import { redirect } from "next/navigation";
 import { Form, Input, Checkbox, Card, Typography } from "antd";
-import { AuthService, SignInBody } from "@/services/AuthService";
+import { MailOutlined, LockOutlined } from "@ant-design/icons";
+import { AuthService, LoginRequestDto } from "@/services/AuthService";
 import { useAuthStore } from "@/stores/authStore";
 import Loader from "@/components/Elements/Loader";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/Elements/Toast";
 import {
-  StyledSignForm,
   StyledRememberMe,
   StyledSignLink,
   StyledSignTextGrey,
@@ -123,6 +124,7 @@ const HeaderContainer = styled.div`
 
 const SignIn = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const {
     isAuthenticated,
     isLoading,
@@ -139,7 +141,7 @@ const SignIn = () => {
   >([]);
 
   useEffect(() => {
-    const newCircles = Array.from({ length: 8 }, (_, i) => ({
+    const newCircles = Array.from({ length: 8 }, () => ({
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
       size: `${Math.random() * 200 + 50}px`,
@@ -158,15 +160,23 @@ const SignIn = () => {
     redirect("/home");
   }
 
-  const signInUser = async (values: SignInBody) => {
+  const signInUser = async (values: LoginRequestDto) => {
     setError(null);
     setLoading(true);
     try {
-      const { accessToken, refreshToken } =
-        await AuthService.adminSignIn(values);
+      const response = await AuthService.adminLogin(values);
+      const { accessToken, refreshToken } = response.data;
       setTokens(accessToken, refreshToken);
+      toast.success("Đăng nhập thành công");
     } catch (error: unknown) {
-      setError(`Đăng nhập thất bại, ${error}`);
+      const errorResponse = error as {
+        response?: { data?: { message?: string } };
+      };
+      const errorMessage =
+        errorResponse?.response?.data?.message ||
+        "Đăng nhập thất bại, vui lòng thử lại.";
+      setError(errorMessage);
+      toast.error(errorMessage);
       setLoading(false);
     }
   };
@@ -208,22 +218,26 @@ const SignIn = () => {
           </Typography.Paragraph>
         </HeaderContainer>
 
-        <StyledSignForm
+        <Form<LoginRequestDto>
           name="basic"
           initialValues={{
-            remember: true,
             username: "",
             password: "",
           }}
           onFinish={signInUser}
           onFinishFailed={onFinishFailed}
+          className="login-form"
         >
           <Form.Item
             name="username"
             className="form-field"
             rules={[{ required: true, message: "Please input your username!" }]}
           >
-            <Input placeholder={t("common.username")} size="large" />
+            <Input
+              prefix={<MailOutlined className="site-form-item-icon" />}
+              placeholder={t("common.username")}
+              size="large"
+            />
           </Form.Item>
 
           <Form.Item
@@ -231,7 +245,11 @@ const SignIn = () => {
             className="form-field"
             rules={[{ required: true, message: "Please input your Password!" }]}
           >
-            <Input.Password placeholder={t("common.password")} size="large" />
+            <Input.Password
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              placeholder={t("common.password")}
+              size="large"
+            />
           </Form.Item>
 
           <StyledRememberMe>
@@ -260,7 +278,7 @@ const SignIn = () => {
               {t("common.signup")}
             </StyledSignLinkTag>
           </div>
-        </StyledSignForm>
+        </Form>
       </StyledCard>
     </LoginContainer>
   );

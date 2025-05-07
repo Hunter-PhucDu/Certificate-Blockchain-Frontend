@@ -4,12 +4,14 @@ import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/Elements/Loader";
+import { useToast } from "@/components/Elements/Toast";
 
 export default function Page() {
   const router = useRouter();
   const { isAuthenticated, isLoading, initializeFromStorage, setLoading } =
     useAuthStore();
   const [key, setKey] = useState(0);
+  const { toast } = useToast();
 
   useEffect(() => {
     setLoading(true);

@@ -3,6 +3,7 @@
     "welcome": "Welcome to Certificate Blockchain",
     "dashboard": "Dashboard",
     "certificates": "Certificates",
+    "logManagement": "Log Management",
     "users": {
       "title": "Users",
       "students": "Students",
@@ -11,8 +12,8 @@
     },
     "organizations": {
       "title": "Organizations",
-      "schools": "Schools",
-      "universities": "Universities"
+      "list": "Organization List",
+      "create": "Create Organization"
     },
     "documents": "Documents",
     "settings": "Settings",
@@ -31,5 +32,19 @@
     "totalCertificates": "Total Certificates",
     "pendingApprovals": "Pending Approvals",
     "recentActivity": "Recent Activity"
+  },
+  "logs": {
+    "title": "System Logs",
+    "username": "Username",
+    "action": "Action",
+    "payload": "Payload",
+    "role": "Role",
+    "timestamp": "Timestamp",
+    "search": "Search by action",
+    "noData": "No logs found",
+    "exportCSV": "Export CSV",
+    "exporting": "Exporting logs...",
+    "exportSuccess": "Logs exported successfully",
+    "exportError": "Failed to export logs"
   }
 }

@@ -8,9 +8,14 @@ import {
   TeamOutlined,
   UserOutlined,
   DesktopOutlined,
+  SettingOutlined,
+  AppstoreOutlined,
+  BankOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "@/stores/authStore";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -29,41 +34,153 @@ function getItem(
   icon?: React.ReactNode,
   children?: MenuItemWithPath[],
 ): MenuItemWithPath {
-  const label = labelKey;
-
   return {
     key,
     icon,
     children,
-    label: path ? <Link href={path}>{label}</Link> : label,
+    label: path ? <Link href={path}>{labelKey}</Link> : labelKey,
     path,
   } as MenuItemWithPath;
 }
 
 export const useMenuItems = (): MenuItem[] => {
   const { t } = useTranslation();
+  const { userRole } = useAuthStore();
 
-  return [
-    getItem(t("common.dashboard"), "1", "/home", <PieChartOutlined />),
+  // Common menu items for all users
+  const commonItems = [
+    getItem(t("common.dashboard"), "dashboard", "/home", <PieChartOutlined />),
+    getItem(t("common.settings"), "settings", "/settings", <SettingOutlined />),
+  ];
+
+  // Admin-specific menu items (for both SUPER_ADMIN and ADMIN)
+  const adminItems = [
+    ...commonItems,
+    getItem(
+      t("common.logManagement"),
+      "logs",
+      "/log-management",
+      <HistoryOutlined />,
+    ),
+    getItem(t("common.users.title"), "users", "", <UserOutlined />, [
+      getItem(
+        t("common.users.administrators"),
+        "admins",
+        "/users/administrators",
+      ),
+    ]),
+    getItem(
+      t("common.organizations.title"),
+      "organizations",
+      "",
+      <TeamOutlined />,
+      [
+        getItem(
+          t("common.organizations.list"),
+          "org-list",
+          "/organizations/list",
+        ),
+        getItem(
+          t("common.organizations.create"),
+          "org-create",
+          "/organizations/create",
+        ),
+      ],
+    ),
+    getItem(t("common.tenants"), "tenants", "/tenants", <BankOutlined />),
+  ];
+
+  // Organization-specific menu items
+  const organizationItems = [
+    ...commonItems,
     getItem(
       t("common.certificates"),
-      "2",
+      "certificates",
       "/certificates",
       <DesktopOutlined />,
     ),
-    getItem(t("common.users.title"), "sub1", "", <UserOutlined />, [
-      getItem(t("common.users.students"), "3", "/users/students"),
-      getItem(t("common.users.teachers"), "4", "/users/teachers"),
-      getItem(t("common.users.administrators"), "5", "/users/administrators"),
-    ]),
-    getItem(t("common.organizations.title"), "sub2", "", <TeamOutlined />, [
-      getItem(t("common.organizations.schools"), "6", "/organizations/schools"),
-      getItem(
-        t("common.organizations.universities"),
-        "7",
-        "/organizations/universities",
-      ),
-    ]),
-    getItem(t("common.documents"), "9", "/documents", <FileOutlined />),
+    getItem(t("common.groups"), "groups", "/groups", <AppstoreOutlined />),
+    getItem(t("common.documents"), "documents", "/documents", <FileOutlined />),
   ];
+
+  // Return appropriate menu items based on user role
+  if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") {
+    return adminItems;
+  }
+
+  return organizationItems; // Default to organization items
 };
+
+// Export standalone routes for direct use in sidebar component
+export const sidebarRoutes = [
+  {
+    key: "dashboard",
+    label: "common.dashboard",
+    path: "/home",
+    icon: <PieChartOutlined />,
+  },
+  {
+    key: "logs",
+    label: "common.logManagement",
+    path: "/log-management",
+    icon: <HistoryOutlined />,
+  },
+  {
+    key: "users",
+    label: "common.users.title",
+    path: "",
+    icon: <UserOutlined />,
+    children: [
+      {
+        key: "admins",
+        label: "common.users.administrators",
+        path: "/users/administrators",
+        icon: null,
+      },
+    ],
+  },
+  {
+    key: "organizations",
+    label: "common.organizations.title",
+    path: "",
+    icon: <TeamOutlined />,
+    children: [
+      {
+        key: "org-list",
+        label: "common.organizations.list",
+        path: "/organizations/list",
+        icon: null,
+      },
+      {
+        key: "org-create",
+        label: "common.organizations.create",
+        path: "/organizations/create",
+        icon: null,
+      },
+    ],
+  },
+  {
+    key: "certificates",
+    label: "common.certificates",
+    path: "/certificates",
+    icon: <DesktopOutlined />,
+  },
+  {
+    key: "groups",
+    label: "common.groups",
+    path: "/groups",
+    icon: <AppstoreOutlined />,
+  },
+  {
+    key: "documents",
+    label: "common.documents",
+    path: "/documents",
+    icon: <FileOutlined />,
+  },
+  {
+    key: "settings",
+    label: "common.settings",
+    path: "/settings",
+    icon: <SettingOutlined />,
+  },
+];

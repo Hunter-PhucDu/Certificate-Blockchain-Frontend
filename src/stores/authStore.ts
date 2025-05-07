@@ -29,6 +29,7 @@ export interface AuthState {
   clearAuth: () => void;
   initializeFromStorage: () => void;
   setLoading: (isLoading: boolean) => void;
+  userRole: string | null; // Add userRole property
 }
 
 const MINIMUM_LOADING_TIME = 50;
@@ -43,6 +44,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     typeof window !== "undefined"
       ? localStorage.getItem("refresh_token")
       : null,
+  userRole: null,
 
   setUser: (user) => set({ user, isAuthenticated: !!user }),
 
@@ -66,6 +68,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         },
         isAuthenticated: true,
         isLoading: false,
+        userRole: payload.role,
       });
     }, MINIMUM_LOADING_TIME);
   },
@@ -119,6 +122,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               },
               isAuthenticated: true,
               isLoading: false,
+              userRole: payload.role,
             });
             return;
           }

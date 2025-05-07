@@ -5,38 +5,45 @@
 // Pagination parameters for API requests
 export interface PaginationParams {
   page?: number;
-  limit?: number;
+  size?: number;
+  search?: string;
   sort?: string;
   order?: "asc" | "desc";
 }
 
-// Standard paginated response from API
+// Metadata for paginated responses
+export interface MetadataResponseDto {
+  size: number;
+  page: number;
+  totalItem: number;
+  totalPage: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+// Standard paginated response from API with metadata
 export interface PaginatedResponse<T> {
+  code: string;
   data: T[];
-  meta: {
-    page: number;
-    limit: number;
-    totalItems: number;
-    totalPages: number;
-  };
+  metadata: MetadataResponseDto;
 }
 
 // Standard API response
 export interface ApiResponse<T> {
+  code: string;
   data: T;
   message?: string;
-  statusCode: number;
 }
 
 // Error response from API
 export interface ApiErrorResponse {
+  code: string;
   message: string;
   error?: string;
-  statusCode: number;
+  statusCode?: number;
 }
 
 // Query filter options
 export interface QueryFilterOptions extends PaginationParams {
-  search?: string;
   [key: string]: unknown;
 }
