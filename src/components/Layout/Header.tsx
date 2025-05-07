@@ -46,7 +46,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
 
   const { clearAuth } = useAuthStore();
   const handleLogout = () => {
-    // Theme reset is now handled in the clearAuth function
     clearAuth();
   };
 

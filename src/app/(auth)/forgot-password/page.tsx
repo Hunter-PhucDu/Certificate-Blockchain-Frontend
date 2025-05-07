@@ -1,6 +1,6 @@
 "use client";
 
-import OrganizationForgotPassword from "@/features/auth/organization-forgot-password/OrganizationForgotPassword";
+import OrganizationForgotPassword from "@/features/auth/forgot-password/OrganizationForgotPassword";
 
 export default function OrganizationForgotPasswordPage() {
   return <OrganizationForgotPassword />;

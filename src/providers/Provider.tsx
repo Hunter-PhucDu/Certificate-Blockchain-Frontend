@@ -2,11 +2,13 @@
 
 import { CacheProvider } from "@emotion/react";
 import React, { useState, useEffect, createContext, useContext } from "react";
+import "@ant-design/v5-patch-for-react-19";
 import { AntDesignProvider } from "./AntDesignProvider";
 import createEmotionCache from "./createEmotionCache";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { darkThemeColors, lightThemeColors } from "@/config/constants/theme";
 import { ThemeProvider as AntdThemeProvider } from "antd-style";
+import { ToastProvider } from "@/components/Elements/Toast";
 
 const THEME_RESET_EVENT = "theme-reset";
 export const resetThemeToLight = () => {
@@ -141,7 +143,9 @@ export default function Providers({ children }: Props) {
     <QueryClientProvider client={queryClient}>
       <CacheProvider value={clientSideEmotionCache}>
         <ThemeProvider>
-          <AntDesignProvider>{children}</AntDesignProvider>
+          <AntDesignProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AntDesignProvider>
         </ThemeProvider>
       </CacheProvider>
     </QueryClientProvider>

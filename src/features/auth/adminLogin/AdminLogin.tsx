@@ -10,6 +10,7 @@ import { useAuthStore } from "@/stores/authStore";
 import Loader from "@/components/Elements/Loader";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/Elements/Toast";
 import {
   StyledRememberMe,
   StyledSignLink,
@@ -123,6 +124,7 @@ const HeaderContainer = styled.div`
 
 const SignIn = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const {
     isAuthenticated,
     isLoading,
@@ -165,8 +167,16 @@ const SignIn = () => {
       const response = await AuthService.adminLogin(values);
       const { accessToken, refreshToken } = response.data;
       setTokens(accessToken, refreshToken);
+      toast.success("Đăng nhập thành công");
     } catch (error: unknown) {
-      setError(`Đăng nhập thất bại, ${error}`);
+      const errorResponse = error as {
+        response?: { data?: { message?: string } };
+      };
+      const errorMessage =
+        errorResponse?.response?.data?.message ||
+        "Đăng nhập thất bại, vui lòng thử lại.";
+      setError(errorMessage);
+      toast.error(errorMessage);
       setLoading(false);
     }
   };

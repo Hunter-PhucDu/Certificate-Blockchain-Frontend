@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Typography, Checkbox, message } from "antd";
+import { Form, Input, Button, Card, Typography, Checkbox } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/Elements/Toast";
 import { LoginRequestDto, useOrganizationLogin } from "@/services/AuthService";
 import { useAuthStore } from "@/stores/authStore";
 import Link from "next/link";
@@ -53,6 +54,8 @@ const HeaderContainer = styled.div`
 
 const OrganizationLoginPage = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
+
   const router = useRouter();
   const [form] = Form.useForm();
   const organizationLoginMutation = useOrganizationLogin();
@@ -63,13 +66,13 @@ const OrganizationLoginPage = () => {
     initializeFromStorage,
     setLoading: setAuthLoading,
   } = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setAuthLoading(true);
     initializeFromStorage();
   }, [initializeFromStorage, setAuthLoading]);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       router.push("/home");
@@ -80,6 +83,7 @@ const OrganizationLoginPage = () => {
     try {
       setLoading(true);
       await organizationLoginMutation.mutateAsync(values);
+      toast.success("Đăng nhập thành công");
     } catch (error: unknown) {
       const errorResponse = error as {
         response?: { data?: { message?: string } };
@@ -87,8 +91,8 @@ const OrganizationLoginPage = () => {
       const errorMessage =
         errorResponse?.response?.data?.message ||
         "Đăng nhập thất bại, vui lòng thử lại.";
-      message.error(errorMessage);
-    } finally {
+      setError(errorMessage);
+      toast.error(errorMessage);
       setLoading(false);
     }
   };
@@ -146,7 +150,7 @@ const OrganizationLoginPage = () => {
               }}
             >
               <Checkbox>{t("common.rememberMe")}</Checkbox>
-              <Link href="/organization-forgot-password">
+              <Link href="/forgot-password">
                 <Text type="secondary" style={{ cursor: "pointer" }}>
                   {t("common.forgotPassword")}
                 </Text>
@@ -163,16 +167,6 @@ const OrganizationLoginPage = () => {
               loading={organizationLoginMutation.isPending || loading}
             >
               {t("common.login")}
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="link"
-              block
-              onClick={() => router.push("/admin-login")}
-            >
-              {t("common.switchToAdminLogin")}
             </Button>
           </Form.Item>
         </Form>

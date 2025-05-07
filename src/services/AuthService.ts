@@ -43,6 +43,23 @@ export interface ChangePasswordRequestDto {
   newPassword: string;
 }
 
+export interface ResendOtpForgotPasswordRequestDto {
+  email: string;
+}
+
+export interface SendLinkResetPasswordRequestDto {
+  email: string;
+  otp: string;
+}
+
+export interface ResetPasswordWithTokenRequestDto {
+  newPassword: string;
+}
+
+export interface UnlockAccountRequestDto {
+  organizationId: string;
+}
+
 const AUTH_ENDPOINTS = {
   LOGIN_ADMIN: "/auth/admin/sign-in",
   LOGIN_ORGANIZATION: "/auth/organization/sign-in",
@@ -52,10 +69,17 @@ const AUTH_ENDPOINTS = {
   ADMIN_FORGOT_PASSWORD: "/auth/admin/forgot-password",
   ADMIN_RESET_PASSWORD: "/auth/admin/reset-password",
   ADMIN_RESET_PASSWORD_BY_ADMIN: "/auth/admin/reset-password-by-admin",
-  ORGANIZATION_GET_OTP_FORGOT_PASSWORD:
-    "/auth/organization/get-otp-forgot-password",
-  ORGANIZATION_FORGOT_PASSWORD: "/auth/organization/forgot-password",
-  ORGANIZATION_RESET_PASSWORD: "/auth/organization/reset-password",
+  ORGANIZATION_GET_OTP_FORGOT_PASSWORD: "/auth/get-otp-forgot-password",
+  ORGANIZATION_FORGOT_PASSWORD: "/auth/forgot-password",
+  ORGANIZATION_RESET_PASSWORD: "/auth/reset-password",
+  ADMIN_RESEND_OTP_FORGOT_PASSWORD: "/auth/admin/resend-otp-forgot-password",
+  ORGANIZATION_RESEND_OTP_FORGOT_PASSWORD: "/auth/resend-otp-forgot-password",
+  ADMIN_SEND_LINK_RESET_PASSWORD: "/auth/admin/send-link-reset-password",
+  ORGANIZATION_SEND_LINK_RESET_PASSWORD: "/auth/send-link-reset-password",
+  RESET_PASSWORD_WITH_TOKEN: (token: string) => `/auth/reset-password/${token}`,
+  ORGANIZATION_RESET_PASSWORD_BY_ADMIN: "/auth/organization/reset-password",
+  UNLOCK_ORGANIZATION_ACCOUNT: (organizationId: string) =>
+    `/auth/unlock-account/${organizationId}`,
 };
 
 export const AuthService = {
@@ -136,6 +160,72 @@ export const AuthService = {
     return apiService.post<ApiResponse<void>>(
       AUTH_ENDPOINTS.ORGANIZATION_RESET_PASSWORD,
       data,
+    );
+  },
+
+  async resetPasswordByAdmin(
+    data: ResetPasswordByAdminRequestDto,
+  ): Promise<void> {
+    await apiService.put(AUTH_ENDPOINTS.ADMIN_RESET_PASSWORD_BY_ADMIN, data);
+  },
+
+  // Thêm các phương thức mới
+  resendOtpForgotPasswordAdmin: (
+    data: ResendOtpForgotPasswordRequestDto,
+  ): Promise<void> => {
+    return apiService.post(
+      AUTH_ENDPOINTS.ADMIN_RESEND_OTP_FORGOT_PASSWORD,
+      data,
+    );
+  },
+
+  resendOtpForgotPasswordOrganization: (
+    data: ResendOtpForgotPasswordRequestDto,
+  ): Promise<void> => {
+    return apiService.post(
+      AUTH_ENDPOINTS.ORGANIZATION_RESEND_OTP_FORGOT_PASSWORD,
+      data,
+    );
+  },
+
+  sendLinkResetPasswordAdmin: (
+    data: SendLinkResetPasswordRequestDto,
+  ): Promise<void> => {
+    return apiService.post(AUTH_ENDPOINTS.ADMIN_SEND_LINK_RESET_PASSWORD, data);
+  },
+
+  sendLinkResetPasswordOrganization: (
+    data: SendLinkResetPasswordRequestDto,
+  ): Promise<void> => {
+    return apiService.post(
+      AUTH_ENDPOINTS.ORGANIZATION_SEND_LINK_RESET_PASSWORD,
+      data,
+    );
+  },
+
+  resetPasswordWithToken: (
+    token: string,
+    data: ResetPasswordWithTokenRequestDto,
+  ): Promise<void> => {
+    return apiService.put(
+      AUTH_ENDPOINTS.RESET_PASSWORD_WITH_TOKEN(token),
+      data,
+    );
+  },
+
+  resetPasswordOrganizationByAdmin: (
+    data: ResetPasswordByAdminRequestDto,
+  ): Promise<void> => {
+    return apiService.put(
+      AUTH_ENDPOINTS.ORGANIZATION_RESET_PASSWORD_BY_ADMIN,
+      data,
+    );
+  },
+
+  unlockOrganizationAccount: (organizationId: string): Promise<void> => {
+    return apiService.put(
+      AUTH_ENDPOINTS.UNLOCK_ORGANIZATION_ACCOUNT(organizationId),
+      {},
     );
   },
 };
@@ -234,5 +324,28 @@ export const useOrganizationResetPassword = () => {
   return useMutation({
     mutationFn: (data: ResetPasswordLinkRequestDto) =>
       AuthService.organizationResetPassword(data),
+  });
+};
+
+export const useAdminSendLinkResetPassword = () => {
+  return useMutation({
+    mutationFn: (data: SendLinkResetPasswordRequestDto) =>
+      AuthService.sendLinkResetPasswordAdmin(data),
+  });
+};
+
+export const useOrganizationSendLinkResetPassword = () => {
+  return useMutation({
+    mutationFn: (data: SendLinkResetPasswordRequestDto) =>
+      AuthService.sendLinkResetPasswordOrganization(data),
+  });
+};
+
+export const useResetPasswordWithToken = () => {
+  return useMutation({
+    mutationFn: (data: { token: string } & ResetPasswordWithTokenRequestDto) =>
+      AuthService.resetPasswordWithToken(data.token, {
+        newPassword: data.newPassword,
+      }),
   });
 };

@@ -9,7 +9,6 @@ import {
   UserOutlined,
   DesktopOutlined,
   SettingOutlined,
-  KeyOutlined,
   AppstoreOutlined,
   BankOutlined,
   HistoryOutlined,

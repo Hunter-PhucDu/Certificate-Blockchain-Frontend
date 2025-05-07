@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import "@ant-design/v5-patch-for-react-19";
 import { Form, Input, Button, Card, Typography, Steps } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import {
   OtpForgotPasswordRequestDto,
-  useAdminGetOtpForgotPassword,
-  useAdminSendLinkResetPassword,
+  useOrganizationGetOtpForgotPassword,
+  useOrganizationSendLinkResetPassword,
 } from "@/services/AuthService";
 import OtpInputComponent from "@/components/Elements/OtpInput";
 import { useToast } from "@/components/Elements/Toast";
@@ -26,7 +27,7 @@ const steps = [
   },
 ];
 
-const AdminForgotPasswordPage = () => {
+const OrganizationForgotPasswordPage = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const [emailForm] = Form.useForm();
@@ -35,8 +36,8 @@ const AdminForgotPasswordPage = () => {
   const [otp, setOtp] = useState("");
   const { toast } = useToast();
 
-  const getOtpMutation = useAdminGetOtpForgotPassword();
-  const sendLinkMutation = useAdminSendLinkResetPassword();
+  const getOtpMutation = useOrganizationGetOtpForgotPassword();
+  const sendLinkMutation = useOrganizationSendLinkResetPassword();
 
   const handleRequestOtp = async (values: OtpForgotPasswordRequestDto) => {
     getOtpMutation.mutate(values, {
@@ -64,6 +65,7 @@ const AdminForgotPasswordPage = () => {
       {
         onSuccess: () => {
           toast.success("Xác thực OTP thành công");
+          router.push("/login");
         },
         onError: (error: any) => {
           toast.error(error?.response?.data?.message || "Mã OTP không hợp lệ");
@@ -108,11 +110,7 @@ const AdminForgotPasswordPage = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button
-                type="link"
-                block
-                onClick={() => router.push("/admin-login")}
-              >
+              <Button type="link" block onClick={() => router.push("/login")}>
                 {t("common.backToLogin")}
               </Button>
             </Form.Item>
@@ -154,7 +152,7 @@ const AdminForgotPasswordPage = () => {
             {t("common.forgotPassword")}
           </Title>
           <Paragraph type="secondary">
-            Khôi phục mật khẩu quản trị viên của bạn
+            Khôi phục mật khẩu tổ chức của bạn
           </Paragraph>
         </div>
 
@@ -166,4 +164,4 @@ const AdminForgotPasswordPage = () => {
   );
 };
 
-export default AdminForgotPasswordPage;
+export default OrganizationForgotPasswordPage;
