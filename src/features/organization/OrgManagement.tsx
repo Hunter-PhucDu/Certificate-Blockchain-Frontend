@@ -8,16 +8,19 @@ import {
   Input,
   Modal,
   Form,
-  message,
   Popconfirm,
   Card,
-  Upload,
+  Select,
   App,
+  Upload,
+  Tooltip,
 } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
   UploadOutlined,
+  LockOutlined,
+  KeyOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import {
@@ -27,6 +30,11 @@ import {
   useDeleteOrganization,
   Organization,
 } from "@/services/OrganizationService";
+import { useUnusedTenants, Tenant } from "@/services/TenantService";
+import {
+  useResetPasswordOrganizationByAdmin,
+  useUnlockOrganizationAccount,
+} from "@/services/AuthService";
 import type { UploadFile } from "antd/es/upload/interface";
 
 const OrgManagement: React.FC = () => {
@@ -35,13 +43,18 @@ const OrgManagement: React.FC = () => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
-  const [searchText, setSearchText] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [resetPasswordModalVisible, setResetPasswordModalVisible] =
+    useState(false);
+  const [resetPasswordForm] = Form.useForm();
 
   const { data: orgsData, isLoading } = useOrganizations();
+  const { data: unusedTenantsData } = useUnusedTenants();
   const createOrg = useCreateOrganization();
   const updateOrg = useUpdateOrganization();
   const deleteOrg = useDeleteOrganization();
+  const resetPassword = useResetPasswordOrganizationByAdmin();
+  const unlockAccount = useUnlockOrganizationAccount();
 
   const showModal = (org?: Organization) => {
     if (org) {
@@ -71,12 +84,18 @@ const OrgManagement: React.FC = () => {
     setFileList([]);
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Organization) => {
     try {
-      const formData = {
-        ...values,
-        logo: fileList[0]?.url || fileList[0]?.response?.url,
-      };
+      const formData = new FormData();
+      (Object.keys(values) as (keyof Organization)[]).forEach((key) => {
+        if (key !== "logo") {
+          formData.append(key, values[key] as string);
+        }
+      });
+
+      if (fileList[0]?.originFileObj) {
+        formData.append("logo", fileList[0].originFileObj);
+      }
 
       if (editingOrg) {
         await updateOrg.mutateAsync({
@@ -85,13 +104,13 @@ const OrgManagement: React.FC = () => {
         });
         messageApi.success(t("common.organizations.updateSuccess"));
       } else {
-        await createOrg.mutateAsync(formData);
+        await createOrg.mutateAsync(values);
         messageApi.success(t("common.organizations.createSuccess"));
       }
       setIsModalVisible(false);
       form.resetFields();
       setFileList([]);
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.organizations.error"));
     }
   };
@@ -100,7 +119,30 @@ const OrgManagement: React.FC = () => {
     try {
       await deleteOrg.mutateAsync(id);
       messageApi.success(t("common.organizations.deleteSuccess"));
-    } catch (error) {
+    } catch {
+      messageApi.error(t("common.organizations.error"));
+    }
+  };
+
+  const handleResetPassword = async (values: { newPassword: string }) => {
+    try {
+      await resetPassword.mutateAsync({
+        email: editingOrg?.email || "",
+        newPassword: values.newPassword,
+      });
+      messageApi.success(t("common.organizations.resetPasswordSuccess"));
+      setResetPasswordModalVisible(false);
+      resetPasswordForm.resetFields();
+    } catch {
+      messageApi.error(t("common.organizations.error"));
+    }
+  };
+
+  const handleUnlockAccount = async (id: string) => {
+    try {
+      await unlockAccount.mutateAsync(id);
+      messageApi.success(t("common.organizations.unlockSuccess"));
+    } catch {
       messageApi.error(t("common.organizations.error"));
     }
   };
@@ -129,18 +171,36 @@ const OrgManagement: React.FC = () => {
     {
       title: t("common.organizations.actions"),
       key: "actions",
-      render: (_: any, record: Organization) => (
+      render: (_: unknown, record: Organization) => (
         <Space>
           <Button type="link" onClick={() => showModal(record)}>
             {t("common.organizations.edit")}
           </Button>
+          <Tooltip title={t("common.organizations.resetPassword")}>
+            <Button
+              type="link"
+              icon={<KeyOutlined />}
+              loading={resetPassword.isPending}
+              onClick={() => {
+                setResetPasswordModalVisible(true);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title={t("common.organizations.unlockAccount")}>
+            <Button
+              type="link"
+              icon={<LockOutlined />}
+              loading={unlockAccount.isPending}
+              onClick={() => handleUnlockAccount(record.tenantId)}
+            />
+          </Tooltip>
           <Popconfirm
             title={t("common.organizations.confirmDelete")}
             onConfirm={() => handleDelete(record.tenantId)}
             okText="Yes"
             cancelText="No"
           >
-            <Button type="link" danger>
+            <Button type="link" danger loading={deleteOrg.isPending}>
               {t("common.organizations.delete")}
             </Button>
           </Popconfirm>
@@ -155,7 +215,6 @@ const OrgManagement: React.FC = () => {
         <Input
           placeholder={t("common.organizations.search")}
           prefix={<SearchOutlined />}
-          onChange={(e) => setSearchText(e.target.value)}
           style={{ width: 200 }}
         />
         <Button
@@ -185,6 +244,21 @@ const OrgManagement: React.FC = () => {
         footer={null}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          {!editingOrg && (
+            <Form.Item
+              name="tenantId"
+              label={t("common.organizations.tenant")}
+              rules={[{ required: true }]}
+            >
+              <Select
+                placeholder={t("common.organizations.selectTenant")}
+                options={unusedTenantsData?.data.map((tenant: Tenant) => ({
+                  label: tenant.organizationName,
+                  value: tenant.id,
+                }))}
+              />
+            </Form.Item>
+          )}
           <Form.Item
             name="organizationName"
             label={t("common.organizations.name")}
@@ -205,32 +279,72 @@ const OrgManagement: React.FC = () => {
           <Form.Item name="address" label={t("common.organizations.address")}>
             <Input />
           </Form.Item>
-          {!editingOrg && (
-            <Form.Item
-              name="password"
-              label={t("common.password")}
-              rules={[{ required: true }]}
-            >
-              <Input.Password />
+          {editingOrg && (
+            <Form.Item label={t("common.organizations.logo")}>
+              <Upload
+                listType="picture"
+                maxCount={1}
+                fileList={fileList}
+                onChange={({ fileList }) => setFileList(fileList)}
+                beforeUpload={() => false}
+              >
+                <Button icon={<UploadOutlined />}>{t("common.upload")}</Button>
+              </Upload>
             </Form.Item>
           )}
-          <Form.Item label={t("common.organizations.logo")}>
-            <Upload
-              listType="picture"
-              maxCount={1}
-              fileList={fileList}
-              onChange={({ fileList }) => setFileList(fileList)}
-              beforeUpload={() => false}
-            >
-              <Button icon={<UploadOutlined />}>{t("common.upload")}</Button>
-            </Upload>
-          </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={editingOrg ? updateOrg.isPending : createOrg.isPending}
+              >
                 {editingOrg ? t("common.update") : t("common.create")}
               </Button>
               <Button onClick={handleCancel}>{t("common.cancel")}</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={t("common.organizations.resetPassword")}
+        open={resetPasswordModalVisible}
+        onCancel={() => {
+          setResetPasswordModalVisible(false);
+          resetPasswordForm.resetFields();
+        }}
+        footer={null}
+      >
+        <Form
+          form={resetPasswordForm}
+          layout="vertical"
+          onFinish={handleResetPassword}
+        >
+          <Form.Item
+            name="newPassword"
+            label={t("common.newPassword")}
+            rules={[{ required: true }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={resetPassword.isPending}
+              >
+                {t("common.submit")}
+              </Button>
+              <Button
+                onClick={() => {
+                  setResetPasswordModalVisible(false);
+                  resetPasswordForm.resetFields();
+                }}
+              >
+                {t("common.cancel")}
+              </Button>
             </Space>
           </Form.Item>
         </Form>

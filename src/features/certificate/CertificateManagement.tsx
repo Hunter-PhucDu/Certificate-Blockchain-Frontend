@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
 import {
-  Card,
   Button,
   Space,
   Table,
@@ -27,6 +27,12 @@ import {
 import CertificatePreview from "./CertificatePreview";
 import CertificateCreate from "./CertificateCreate";
 import { App } from "antd";
+import {
+  useCreateCertificate,
+  useDeleteCertificate,
+  useUpdateCertificate,
+  useCertificates,
+} from "@/services/CertificateService";
 
 const { Title } = Typography;
 
@@ -68,49 +74,49 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
   const [searchText, setSearchText] = useState("");
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
 
+  const { refetch: refetchCertificates } = useCertificates();
+  const createCertificate = useCreateCertificate();
+  const deleteCertificate = useDeleteCertificate();
+  const updateCertificate = useUpdateCertificate();
+
   const handleCreateCertificate = async (values: any) => {
     try {
-      const newCertificate: Certificate = {
-        id: String(certificates.length + 1),
+      await createCertificate.mutateAsync({
         groupId,
-        ...values,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      onCertificatesChange([...certificates, newCertificate]);
+        certificateType: values.certificateType,
+        certificateData: values.certificateData,
+      });
       messageApi.success(t("common.certificates.createSuccess"));
       setIsModalVisible(false);
-    } catch (error) {
+      refetchCertificates();
+    } catch {
       messageApi.error(t("common.certificates.error"));
     }
   };
 
   const handleEditCertificate = async (values: any) => {
     try {
-      const updatedCertificates = certificates.map((cert) =>
-        cert.id === editingCertificate?.id
-          ? {
-              ...cert,
-              ...values,
-              updatedAt: new Date().toISOString(),
-            }
-          : cert,
-      );
-      onCertificatesChange(updatedCertificates);
+      if (!editingCertificate) return;
+      await updateCertificate.mutateAsync({
+        id: editingCertificate.id,
+        data: {
+          certificateData: values.certificateData,
+        },
+      });
       messageApi.success(t("common.certificates.updateSuccess"));
       setIsModalVisible(false);
-    } catch (error) {
+      refetchCertificates();
+    } catch {
       messageApi.error(t("common.certificates.error"));
     }
   };
 
   const handleDeleteCertificate = async (certificateId: string) => {
     try {
-      onCertificatesChange(
-        certificates.filter((cert) => cert.id !== certificateId),
-      );
+      await deleteCertificate.mutateAsync(certificateId);
       messageApi.success(t("common.certificates.deleteSuccess"));
-    } catch (error) {
+      refetchCertificates();
+    } catch {
       messageApi.error(t("common.certificates.error"));
     }
   };
@@ -236,10 +242,6 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
           setIsModalVisible(false);
           setEditingCertificate(null);
         }}
-        onSubmit={
-          editingCertificate ? handleEditCertificate : handleCreateCertificate
-        }
-        editingCertificate={editingCertificate}
       />
 
       <Modal

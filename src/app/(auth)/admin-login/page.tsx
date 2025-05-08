@@ -1,7 +1,16 @@
 "use client";
 
-import AdminLogin from "@/features/auth/adminLogin/AdminLogin";
+import dynamic from "next/dynamic";
+import Loader from "@/components/Elements/Loader";
+
+const DynamicAdminLogin = dynamic(
+  () => import("@/features/auth/adminLogin/AdminLogin"),
+  {
+    ssr: false,
+    loading: () => <Loader />,
+  },
+);
 
 export default function LoginPage() {
-  return <AdminLogin />;
+  return <DynamicAdminLogin />;
 }

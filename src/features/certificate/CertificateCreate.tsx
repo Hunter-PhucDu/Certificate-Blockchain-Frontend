@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -18,21 +19,18 @@ import { useTranslation } from "react-i18next";
 import { certificateTemplates } from "@/configs/certificateTemplates";
 import CertificatePreview from "./CertificatePreview";
 import { App } from "antd";
+import { useCreateCertificate } from "@/services/CertificateService";
 
 const { Title } = Typography;
 
 interface CertificateCreateProps {
   isVisible: boolean;
   onCancel: () => void;
-  onSubmit: (values: any) => void;
-  editingCertificate?: any;
 }
 
 const CertificateCreate: React.FC<CertificateCreateProps> = ({
   isVisible,
   onCancel,
-  onSubmit,
-  editingCertificate,
 }) => {
   const { t } = useTranslation();
   const { message: messageApi } = App.useApp();
@@ -49,6 +47,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
     }>
   >([]);
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
+  const createCertificate = useCreateCertificate();
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
@@ -97,8 +96,10 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
 
   const handleSubmit = async (values: any) => {
     try {
+      let certificateData;
+      let certificateType;
       if (isCustomTemplate) {
-        const certificateData = customFields.map((field) => ({
+        certificateData = customFields.map((field) => ({
           key: field.key,
           values: [
             {
@@ -109,18 +110,13 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
             },
           ],
         }));
-        onSubmit({
-          certificateName: values.certificateName,
-          certificateType: values.certificateName,
-          certificateData,
-        });
+        certificateType = values.certificateName;
       } else {
         const template = certificateTemplates.find(
           (t) => t.id === selectedTemplate,
         );
         if (!template) return;
-
-        const certificateData = template.fields.map((field) => ({
+        certificateData = template.fields.map((field) => ({
           key: field.key,
           values: [
             {
@@ -131,13 +127,21 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
             },
           ],
         }));
-        onSubmit({
-          certificateName: values.certificateName,
-          certificateType: values.certificateName,
-          certificateData,
-        });
+        certificateType = template.id;
       }
-    } catch (error) {
+      await createCertificate.mutateAsync({
+        groupId: "", // Nếu có groupId thì truyền vào, hiện tại để rỗng
+        certificateType,
+        certificateData,
+      });
+      messageApi.success(t("common.certificates.createSuccess"));
+      onCancel();
+      form.resetFields();
+      setSelectedTemplate(null);
+      setPreviewData({});
+      setIsCustomTemplate(false);
+      setCustomFields([]);
+    } catch {
       messageApi.error(t("common.error"));
     }
   };
@@ -153,11 +157,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
 
   return (
     <Modal
-      title={
-        editingCertificate
-          ? t("common.certificates.edit")
-          : t("common.certificates.create")
-      }
+      title={t("common.certificates.create")}
       open={isVisible}
       onCancel={handleCancel}
       width={1200}
@@ -183,7 +183,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
               <Input placeholder={t("common.certificates.enterName")} />
             </Form.Item>
 
-            {!editingCertificate && (
+            {!selectedTemplate && (
               <>
                 <Form.Item
                   name="templateType"
@@ -353,17 +353,12 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
               </>
             )}
 
-            {(selectedTemplate || editingCertificate || isCustomTemplate) && (
+            {(selectedTemplate || isCustomTemplate) && (
               <>
                 <Divider>{t("common.certificates.certificateData")}</Divider>
                 {!isCustomTemplate
                   ? certificateTemplates
-                      .find(
-                        (t) =>
-                          t.id ===
-                          (editingCertificate?.certificateType ||
-                            selectedTemplate),
-                      )
+                      .find((t) => t.id === selectedTemplate)
                       ?.fields.map((field) => (
                         <Form.Item
                           key={field.key}
@@ -430,9 +425,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
             <Form.Item>
               <Space>
                 <Button type="primary" htmlType="submit">
-                  {editingCertificate
-                    ? t("common.certificates.update")
-                    : t("common.certificates.create")}
+                  {t("common.certificates.create")}
                 </Button>
                 <Button onClick={handleCancel}>
                   {t("common.certificates.cancel")}
@@ -457,11 +450,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
                       type: field.type as "text" | "number" | "date" | "select",
                     })),
                   }
-                : certificateTemplates.find(
-                    (t) =>
-                      t.id ===
-                      (editingCertificate?.certificateType || selectedTemplate),
-                  )
+                : certificateTemplates.find((t) => t.id === selectedTemplate)
             }
             data={previewData}
           />

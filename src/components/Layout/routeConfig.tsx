@@ -9,9 +9,9 @@ import {
   UserOutlined,
   SettingOutlined,
   AppstoreOutlined,
-  BankOutlined,
   HistoryOutlined,
   FileProtectOutlined,
+  CloudServerOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
@@ -60,27 +60,23 @@ export const useMenuItems = (): MenuItem[] => {
       "/log-management",
       <HistoryOutlined />,
     ),
-    getItem(t("common.users.title"), "users", "", <UserOutlined />, [
-      getItem(t("common.users.administrators"), "admins", "/admin-management"),
-    ]),
+    getItem(
+      t("common.users.administrators"),
+      "admins",
+      "/admin-management",
+      <UserOutlined />,
+    ),
     getItem(
       t("common.organizations.title"),
       "organizations",
-      "",
+      "/organization-management",
       <TeamOutlined />,
-      [
-        getItem(
-          t("common.organizations.list"),
-          "org-list",
-          "/organization-management",
-        ),
-      ],
     ),
     getItem(
       t("common.tenants.title"),
       "tenants",
       "/tenant-management",
-      <BankOutlined />,
+      <CloudServerOutlined />,
     ),
   ];
 
@@ -154,7 +150,7 @@ export const sidebarRoutes = [
     key: "tenants",
     label: "common.tenants.title",
     path: "/tenant-management",
-    icon: <BankOutlined />,
+    icon: <CloudServerOutlined />,
   },
   {
     key: "certificates",

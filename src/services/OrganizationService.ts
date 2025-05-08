@@ -19,21 +19,43 @@ export interface CreateOrganizationBody {
   tenantId: string;
   organizationName: string;
   email: string;
-  password: string;
   phone?: string;
   address?: string;
 }
 
 export interface UpdateOrganizationBody {
-  logo?: string;
+  logo?: string | File;
   organizationName?: string;
   phone?: string;
   address?: string;
 }
 
+export interface OrganizationStatistics {
+  totalOrganizations: number;
+  organizationsWithout2FA: number;
+  lockedOrganizations: number;
+}
+
+export interface MonthlyData {
+  count: number;
+  month: string;
+}
+
+export interface OrganizationMonthlyStatistics {
+  code: string;
+  data: MonthlyData[];
+}
+
+export interface OrganizationMonthlyStatisticsResponse {
+  code: string;
+  data: MonthlyData[];
+}
+
 const ORGANIZATION_ENDPOINTS = {
   ORGANIZATIONS: "/organizations",
   ORGANIZATION: (id: string) => `/organizations/${id}`,
+  STATISTICS: "/organizations/dashboard/statistics",
+  MONTHLY_STATISTICS: "/organizations/dashboard/monthly-statistics",
 };
 
 export const OrganizationService = {
@@ -60,7 +82,7 @@ export const OrganizationService = {
   },
 
   // Update organization
-  updateOrganization: (id: string, data: UpdateOrganizationBody) => {
+  updateOrganization: (id: string, data: UpdateOrganizationBody | FormData) => {
     return apiService.put<ApiResponse<Organization>>(
       ORGANIZATION_ENDPOINTS.ORGANIZATION(id),
       data,
@@ -71,6 +93,20 @@ export const OrganizationService = {
   deleteOrganization: (id: string) => {
     return apiService.delete<ApiResponse<void>>(
       ORGANIZATION_ENDPOINTS.ORGANIZATION(id),
+    );
+  },
+
+  // Get organization statistics
+  getStatistics: () => {
+    return apiService.get<ApiResponse<OrganizationStatistics>>(
+      ORGANIZATION_ENDPOINTS.STATISTICS,
+    );
+  },
+
+  // Get organization monthly statistics
+  getMonthlyStatistics: () => {
+    return apiService.get<ApiResponse<OrganizationMonthlyStatistics>>(
+      ORGANIZATION_ENDPOINTS.MONTHLY_STATISTICS,
     );
   },
 };
@@ -107,8 +143,13 @@ export const useUpdateOrganization = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateOrganizationBody }) =>
-      OrganizationService.updateOrganization(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateOrganizationBody | FormData;
+    }) => OrganizationService.updateOrganization(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       queryClient.invalidateQueries({
@@ -125,6 +166,23 @@ export const useDeleteOrganization = () => {
     mutationFn: (id: string) => OrganizationService.deleteOrganization(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
+    },
+  });
+};
+
+export const useOrganizationStatistics = () => {
+  return useQuery({
+    queryKey: ["organizations", "statistics"],
+    queryFn: () => OrganizationService.getStatistics(),
+  });
+};
+
+export const useOrganizationMonthlyStatistics = () => {
+  return useQuery({
+    queryKey: ["organizations", "monthly-statistics"],
+    queryFn: async () => {
+      const response = await OrganizationService.getMonthlyStatistics();
+      return response.data;
     },
   });
 };

@@ -11,8 +11,14 @@ import {
   Popconfirm,
   Card,
   App,
+  Tag,
 } from "antd";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import {
   useAdmins,
@@ -44,8 +50,14 @@ const AdminManagement: React.FC = () => {
   const updateAdmin = useUpdateAdmin();
   const deleteAdmin = useDeleteAdmin();
 
-  const handleTableChange = (pagination: any) => {
-    setPagination(pagination);
+  const handleTableChange = (pagination: {
+    current?: number;
+    pageSize?: number;
+  }) => {
+    setPagination({
+      current: pagination.current || 1,
+      pageSize: pagination.pageSize || 10,
+    });
   };
 
   const showModal = (admin?: Admin) => {
@@ -64,18 +76,31 @@ const AdminManagement: React.FC = () => {
     form.resetFields();
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    username: string;
+    password?: string;
+    email?: string;
+  }) => {
     try {
       if (editingAdmin) {
-        await updateAdmin.mutateAsync(values);
+        await updateAdmin.mutateAsync({
+          adminId: editingAdmin.id,
+          data: {
+            username: values.username,
+          },
+        });
         messageApi.success(t("common.admins.updateSuccess"));
       } else {
-        await createAdmin.mutateAsync(values);
+        await createAdmin.mutateAsync({
+          username: values.username,
+          password: values.password!,
+          email: values.email || "",
+        });
         messageApi.success(t("common.admins.createSuccess"));
       }
       setIsModalVisible(false);
       form.resetFields();
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.admins.error"));
     }
   };
@@ -84,9 +109,17 @@ const AdminManagement: React.FC = () => {
     try {
       await deleteAdmin.mutateAsync(id);
       messageApi.success(t("common.admins.deleteSuccess"));
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.admins.error"));
     }
+  };
+
+  const renderRole = (role: string) => {
+    let color = "blue";
+    if (role === "SUPER_ADMIN") {
+      color = "gold";
+    }
+    return <Tag color={color}>{role}</Tag>;
   };
 
   const columns = [
@@ -99,22 +132,39 @@ const AdminManagement: React.FC = () => {
       title: t("common.admins.email"),
       dataIndex: "email",
       key: "email",
+      render: (text: string) => text || "-",
+    },
+    {
+      title: t("common.admins.role"),
+      dataIndex: "role",
+      key: "role",
+      render: renderRole,
     },
     {
       title: t("common.admins.actions"),
       key: "actions",
-      render: (_: any, record: Admin) => (
+      render: (_: unknown, record: Admin) => (
         <Space>
-          <Button type="link" onClick={() => showModal(record)}>
+          <Button
+            type="primary"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => showModal(record)}
+          >
             {t("common.admins.edit")}
           </Button>
           <Popconfirm
             title={t("common.admins.confirmDelete")}
-            onConfirm={() => handleDelete(record.username)}
+            onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
           >
-            <Button type="link" danger>
+            <Button
+              type="primary"
+              danger
+              size="small"
+              icon={<DeleteOutlined />}
+            >
               {t("common.admins.delete")}
             </Button>
           </Popconfirm>
@@ -144,7 +194,7 @@ const AdminManagement: React.FC = () => {
       <Table
         columns={columns}
         dataSource={adminsData?.data}
-        rowKey="username"
+        rowKey="id"
         loading={isLoading}
         pagination={{
           ...pagination,
@@ -169,21 +219,24 @@ const AdminManagement: React.FC = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="email"
-            label={t("common.admins.email")}
-            rules={[{ required: true }, { type: "email" }]}
-          >
-            <Input />
-          </Form.Item>
           {!editingAdmin && (
-            <Form.Item
-              name="password"
-              label={t("common.admins.password")}
-              rules={[{ required: true }]}
-            >
-              <Input.Password />
-            </Form.Item>
+            <>
+              <Form.Item
+                name="email"
+                label={t("common.admins.email")}
+                rules={[{ required: true, type: "email" }]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                label={t("common.admins.password")}
+                rules={[{ required: true }]}
+              >
+                <Input.Password />
+              </Form.Item>
+            </>
           )}
           <Form.Item>
             <Space>

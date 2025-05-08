@@ -16,6 +16,7 @@
     "@emotion/react": "^11.14.0",
     "@next/env": "^15.3.1",
     "@tanstack/react-query": "^5.74.4",
+    "@types/recharts": "^1.8.29",
     "antd": "^5.24.8",
     "antd-style": "^3.7.1",
     "axios": "^1.8.4",
@@ -27,6 +28,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.5.1",
+    "recharts": "^2.15.3",
     "styled-components": "^6.1.17",
     "zustand": "^5.0.3"
   },

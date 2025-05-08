@@ -1,72 +1,37 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Typography, Checkbox } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Typography,
+  Checkbox,
+  Row,
+  Col,
+} from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import styled from "styled-components";
-import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/Elements/Toast";
 import { LoginRequestDto, useOrganizationLogin } from "@/services/AuthService";
 import { useAuthStore } from "@/stores/authStore";
 import Link from "next/link";
-import Loader from "@/components/Elements/Loader";
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
-const OrganizationLoginContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  background: linear-gradient(135deg, #051937, #004d7a, #008793, #00bf72);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
-  padding: 20px;
-
-  @keyframes gradientBG {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-`;
-
-const StyledCard = styled(Card)`
-  width: 100%;
-  max-width: 420px;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-`;
-
-const HeaderContainer = styled.div`
-  text-align: center;
-  margin-bottom: 24px;
-`;
-
-const OrganizationLoginPage = () => {
-  const { t } = useTranslation();
+export default function OrganizationLoginPage() {
   const { toast } = useToast();
-
   const router = useRouter();
-  const [form] = Form.useForm();
-  const organizationLoginMutation = useOrganizationLogin();
-  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm<LoginRequestDto>();
+  const organizationLogin = useOrganizationLogin();
   const {
     isAuthenticated,
     isLoading,
     initializeFromStorage,
     setLoading: setAuthLoading,
   } = useAuthStore();
-  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     setAuthLoading(true);
@@ -75,104 +40,106 @@ const OrganizationLoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      router.push("/home");
+      router.replace("/home");
     }
   }, [isAuthenticated, isLoading, router]);
 
-  const handleSubmit = async (values: LoginRequestDto) => {
+  const onFinish = async (values: LoginRequestDto) => {
+    setSubmitting(true);
     try {
-      setLoading(true);
-      await organizationLoginMutation.mutateAsync(values);
+      await organizationLogin.mutateAsync(values);
       toast.success("Đăng nhập thành công");
+      router.replace("/home");
     } catch (error: unknown) {
-      const errorResponse = error as {
-        response?: { data?: { message?: string } };
+      const resp = error as {
+        response?: { data?: { data?: { message?: string } } };
       };
-      const errorMessage =
-        errorResponse?.response?.data?.message ||
+      const msg =
+        resp?.response?.data?.data?.message ||
         "Đăng nhập thất bại, vui lòng thử lại.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      setLoading(false);
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return null;
 
   return (
-    <OrganizationLoginContainer>
-      <StyledCard>
-        <HeaderContainer>
-          <Title level={2} style={{ marginBottom: "8px", fontWeight: 600 }}>
-            {t("common.organizationLogin")}
-          </Title>
-          <Paragraph type="secondary">
-            Đăng nhập với tài khoản tổ chức để truy cập hệ thống chứng chỉ
-          </Paragraph>
-        </HeaderContainer>
-
-        <Form<LoginRequestDto>
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          initialValues={{ username: "", password: "" }}
+    <Row
+      justify="center"
+      align="middle"
+      style={{
+        minHeight: "100vh",
+        background: "url('/login-bg.jpg') no-repeat center/cover",
+      }}
+    >
+      <Col xs={20} sm={16} md={12} lg={8} xl={6}>
+        <Card
+          hoverable
+          style={{ borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
         >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: t("common.usernameRequired") }]}
+          <Title level={2} style={{ textAlign: "center", marginBottom: 16 }}>
+            {"Organization Login"}
+          </Title>
+          <Paragraph
+            type="secondary"
+            style={{ textAlign: "center", marginBottom: 24 }}
           >
-            <Input
-              prefix={<MailOutlined className="site-form-item-icon" />}
-              placeholder={t("common.username")}
-              size="large"
-            />
-          </Form.Item>
+            {"Đăng nhập với tài khoản tổ chức để truy cập hệ thống chứng chỉ"}
+          </Paragraph>
 
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: t("common.passwordRequired") }]}
+          <Form
+            form={form}
+            layout="vertical"
+            initialValues={{ username: "", password: "" }}
+            onFinish={onFinish}
           >
-            <Input.Password
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              placeholder={t("common.password")}
-              size="large"
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+            <Form.Item
+              name="username"
+              label="Username"
+              rules={[{ required: true, message: "Please enter Username" }]}
             >
-              <Checkbox>{t("common.rememberMe")}</Checkbox>
-              <Link href="/forgot-password">
-                <Text type="secondary" style={{ cursor: "pointer" }}>
-                  {t("common.forgotPassword")}
-                </Text>
-              </Link>
-            </div>
-          </Form.Item>
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="Username"
+                size="large"
+              />
+            </Form.Item>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              block
-              loading={organizationLoginMutation.isPending || loading}
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: "Please enter Password" }]}
             >
-              {t("common.login")}
-            </Button>
-          </Form.Item>
-        </Form>
-      </StyledCard>
-    </OrganizationLoginContainer>
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+                size="large"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Row justify="space-between" align="middle">
+                <Checkbox>{"Remember Me"}</Checkbox>
+                <Link href="/forgot-password">{"Forgot Password"}</Link>
+              </Row>
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                block
+                loading={submitting}
+              >
+                {"Login"}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Col>
+    </Row>
   );
-};
-
-export default OrganizationLoginPage;
+}

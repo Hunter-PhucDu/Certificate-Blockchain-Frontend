@@ -1,130 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
-import { redirect } from "next/navigation";
-import { Form, Input, Checkbox, Card, Typography } from "antd";
+import { useRouter } from "next/navigation";
+import {
+  Form,
+  Input,
+  Checkbox,
+  Card,
+  Typography,
+  Row,
+  Col,
+  Button,
+} from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { AuthService, LoginRequestDto } from "@/services/AuthService";
 import { useAuthStore } from "@/stores/authStore";
-import Loader from "@/components/Elements/Loader";
-import { usePathname } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/Elements/Toast";
-import {
-  StyledRememberMe,
-  StyledSignLink,
-  StyledSignTextGrey,
-  StyledSignLinkTag,
-  SignInButton,
-} from "./index.styled";
-import styled, { keyframes } from "styled-components";
+import Link from "next/link";
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
-const float = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
-`;
-
-const pulse = keyframes`
-  0% { opacity: 0.6; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.6; }
-`;
-
-const LoginContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  background: linear-gradient(135deg, #051937, #004d7a, #008793, #00bf72);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
-  position: relative;
-  overflow: hidden;
-
-  @keyframes gradientBG {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    z-index: 0;
-  }
-
-  &::before {
-    top: -100px;
-    right: -100px;
-    animation: ${float} 6s ease-in-out infinite;
-  }
-
-  &::after {
-    bottom: -100px;
-    left: -100px;
-    animation: ${float} 8s ease-in-out infinite;
-  }
-`;
-
-const Circle = styled.div`
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  animation: ${pulse} 4s infinite;
-  z-index: 0;
-  backdrop-filter: blur(1px);
-`;
-
-const StyledCard = styled(Card)`
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.9);
-  z-index: 1;
-  position: relative;
-  overflow: hidden;
-  transition: box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-  }
-
-  .ant-card-head {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .ant-card-body {
-    padding: 24px;
-  }
-`;
-
-const HeaderContainer = styled.div`
-  text-align: center;
-  margin-bottom: 24px;
-`;
-
-const SignIn = () => {
-  const { t } = useTranslation();
+export default function SignIn() {
   const { toast } = useToast();
+  const router = useRouter();
   const {
     isAuthenticated,
     isLoading,
@@ -132,147 +30,118 @@ const SignIn = () => {
     setLoading,
     setTokens,
   } = useAuthStore();
-  const [error, setError] = useState<string | null>(null);
-  const pathname = usePathname();
-  const [key, setKey] = useState(0);
 
-  const [circles, setCircles] = useState<
-    { top: string; left: string; size: string; delay: string }[]
-  >([]);
-
-  useEffect(() => {
-    const newCircles = Array.from({ length: 8 }, () => ({
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: `${Math.random() * 200 + 50}px`,
-      delay: `${Math.random() * 5}s`,
-    }));
-    setCircles(newCircles);
-  }, []);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     initializeFromStorage();
-    setKey((prev) => prev + 1);
-  }, [pathname, initializeFromStorage, setLoading]);
+  }, [initializeFromStorage, setLoading]);
 
-  if (isAuthenticated && !isLoading) {
-    redirect("/home");
-  }
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      router.replace("/home");
+    }
+  });
 
-  const signInUser = async (values: LoginRequestDto) => {
-    setError(null);
-    setLoading(true);
+  const onFinish = async (values: LoginRequestDto) => {
+    setSubmitting(true);
     try {
-      const response = await AuthService.adminLogin(values);
-      const { accessToken, refreshToken } = response.data;
+      const resp = await AuthService.adminLogin(values);
+      const { accessToken, refreshToken } = resp.data;
       setTokens(accessToken, refreshToken);
-      toast.success("Đăng nhập thành công");
+      router.replace("/home");
     } catch (error: unknown) {
-      const errorResponse = error as {
-        response?: { data?: { message?: string } };
+      const resp = error as {
+        response?: { data?: { data?: { message?: string } } };
       };
-      const errorMessage =
-        errorResponse?.response?.data?.message ||
+      const msg =
+        resp?.response?.data?.data?.message ||
         "Đăng nhập thất bại, vui lòng thử lại.";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      toast.error(msg);
       setLoading(false);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (isLoading) {
-    return <Loader key={`loader-${key}`} />;
-  }
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
-
-  const onGoToForgetPassword = () => {
-    redirect("/forget-password");
-  };
-
   return (
-    <LoginContainer>
-      {circles.map((circle, i) => (
-        <Circle
-          key={i}
+    <Row
+      justify="center"
+      align="middle"
+      style={{
+        minHeight: "100vh",
+        background: "url('/login-bg.jpg') no-repeat center/cover",
+      }}
+    >
+      <Col xs={20} sm={16} md={12} lg={8} xl={6}>
+        <Card
+          hoverable
           style={{
-            top: circle.top,
-            left: circle.left,
-            width: circle.size,
-            height: circle.size,
-            animationDelay: circle.delay,
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           }}
-        />
-      ))}
-
-      <StyledCard>
-        <HeaderContainer>
-          <Title level={2} style={{ marginBottom: "8px", fontWeight: 600 }}>
-            Đăng nhập
-          </Title>
-          <Typography.Paragraph type="secondary">
-            Đăng nhập để truy cập hệ thống quản lý chứng chỉ
-          </Typography.Paragraph>
-        </HeaderContainer>
-
-        <Form<LoginRequestDto>
-          name="basic"
-          initialValues={{
-            username: "",
-            password: "",
-          }}
-          onFinish={signInUser}
-          onFinishFailed={onFinishFailed}
-          className="login-form"
         >
-          <Form.Item
-            name="username"
-            className="form-field"
-            rules={[{ required: true, message: "Please input your username!" }]}
+          <Title level={2} style={{ textAlign: "center", marginBottom: 16 }}>
+            Login
+          </Title>
+          <Paragraph
+            type="secondary"
+            style={{ textAlign: "center", marginBottom: 24 }}
           >
-            <Input
-              prefix={<MailOutlined className="site-form-item-icon" />}
-              placeholder={t("common.username")}
-              size="large"
-            />
-          </Form.Item>
+            Login to access the certificate management system
+          </Paragraph>
 
-          <Form.Item
-            name="password"
-            className="form-field"
-            rules={[{ required: true, message: "Please input your Password!" }]}
+          <Form<LoginRequestDto>
+            layout="vertical"
+            initialValues={{ username: "", password: "" }}
+            onFinish={onFinish}
           >
-            <Input.Password
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              placeholder={t("common.password")}
-              size="large"
-            />
-          </Form.Item>
+            <Form.Item
+              name="username"
+              label="Username"
+              rules={[{ required: true, message: "Please enter Username" }]}
+            >
+              <Input
+                prefix={<MailOutlined />}
+                placeholder={"Username"}
+                size="large"
+              />
+            </Form.Item>
 
-          <StyledRememberMe>
-            <Checkbox>{"Remember Me"}</Checkbox>
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: "Please enter password" }]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder={"Password"}
+                size="large"
+              />
+            </Form.Item>
 
-            <StyledSignLink onClick={onGoToForgetPassword}>
-              {"Forget Password"}
-            </StyledSignLink>
-          </StyledRememberMe>
+            <Form.Item>
+              <Row justify="space-between" align="middle">
+                <Checkbox>{"Remember Me"}</Checkbox>
+                <Link href="/admin-forgot-password">{"Forgot Password"}</Link>
+              </Row>
+            </Form.Item>
 
-          {error && (
-            <div style={{ color: "red", marginBottom: "16px" }}>{error}</div>
-          )}
-
-          <div className="form-btn-field">
-            <SignInButton type="primary" htmlType="submit" size="large">
-              {"Login"}
-            </SignInButton>
-          </div>
-        </Form>
-      </StyledCard>
-    </LoginContainer>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                block
+                loading={submitting}
+              >
+                Login
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Col>
+    </Row>
   );
-};
-
-export default SignIn;
+}

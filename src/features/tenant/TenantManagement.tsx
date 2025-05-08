@@ -8,7 +8,6 @@ import {
   Input,
   Modal,
   Form,
-  message,
   Popconfirm,
   Card,
   Select,
@@ -33,7 +32,7 @@ const TenantManagement: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 20,
   });
 
   const { data: tenantsData, isLoading } = useSearchTenants({
@@ -46,8 +45,14 @@ const TenantManagement: React.FC = () => {
   const updateTenant = useUpdateTenant();
   const deleteTenant = useDeleteTenant();
 
-  const handleTableChange = (pagination: any) => {
-    setPagination(pagination);
+  const handleTableChange = (pagination: {
+    current?: number;
+    pageSize?: number;
+  }) => {
+    setPagination({
+      current: pagination.current || 1,
+      pageSize: pagination.pageSize || 20,
+    });
   };
 
   const showModal = (tenant?: Tenant) => {
@@ -66,11 +71,11 @@ const TenantManagement: React.FC = () => {
     form.resetFields();
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Tenant) => {
     try {
       if (editingTenant) {
         await updateTenant.mutateAsync({
-          id: editingTenant.tenantName,
+          id: editingTenant.id,
           data: values,
         });
         messageApi.success(t("common.tenants.updateSuccess"));
@@ -80,7 +85,7 @@ const TenantManagement: React.FC = () => {
       }
       setIsModalVisible(false);
       form.resetFields();
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.tenants.error"));
     }
   };
@@ -89,7 +94,7 @@ const TenantManagement: React.FC = () => {
     try {
       await deleteTenant.mutateAsync(id);
       messageApi.success(t("common.tenants.deleteSuccess"));
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.tenants.error"));
     }
   };
@@ -113,7 +118,7 @@ const TenantManagement: React.FC = () => {
     {
       title: t("common.tenants.actions"),
       key: "actions",
-      render: (_: any, record: Tenant) => (
+      render: (_: unknown, record: Tenant) => (
         <Space>
           <Button type="link" onClick={() => showModal(record)}>
             {t("common.tenants.edit")}

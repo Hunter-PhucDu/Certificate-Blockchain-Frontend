@@ -2,7 +2,6 @@
 
 import { apiService } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
-import { ApiResponse, PaginatedResponse } from "./api/types";
 
 export interface Log {
   username: string;

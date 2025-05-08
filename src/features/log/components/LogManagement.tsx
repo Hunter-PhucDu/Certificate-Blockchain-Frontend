@@ -13,7 +13,6 @@ import {
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useSystemLogs, useAllLogs } from "@/services/LogService";
-import type { Log } from "@/services/LogService";
 import { format } from "date-fns";
 import { DownloadOutlined } from "@ant-design/icons";
 
@@ -24,7 +23,7 @@ const LogManagement: React.FC = () => {
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 20;
   const [isExporting, setIsExporting] = useState(false);
 
   const { data: logsData, isLoading } = useSystemLogs({
@@ -33,7 +32,7 @@ const LogManagement: React.FC = () => {
     search: searchText,
   });
 
-  const { data: allLogs, refetch: refetchAllLogs } = useAllLogs();
+  const { refetch: refetchAllLogs } = useAllLogs();
 
   const formatPayload = (text: string) => {
     try {

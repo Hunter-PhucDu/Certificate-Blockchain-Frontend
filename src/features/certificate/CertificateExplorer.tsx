@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Layout,
   Tree,
@@ -13,23 +14,29 @@ import {
   Space,
   Typography,
   Divider,
-  Popconfirm,
   Dropdown,
-  Table,
+  Spin,
+  Empty,
 } from "antd";
 import {
   FolderOutlined,
-  FileOutlined,
   PlusOutlined,
   MoreOutlined,
   EditOutlined,
   DeleteOutlined,
-  SearchOutlined,
-  EyeOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-// import { useGroups, useCreateGroup, useDeleteGroup } from "@/services/GroupService";
-// import { useCertificates, useCreateCertificate, useDeleteCertificate } from "@/services/CertificateService";
+import {
+  useGroups,
+  useCreateGroup,
+  useDeleteGroup,
+  useUpdateGroup,
+} from "@/services/GroupService";
+import {
+  useCertificates,
+  useCreateCertificate,
+  useDeleteCertificate,
+} from "@/services/CertificateService";
 import {
   certificateTemplates,
   CertificateTemplate,
@@ -38,7 +45,6 @@ import { App } from "antd";
 import CertificatePreview from "./CertificatePreview";
 import CertificateManagement from "./CertificateManagement";
 import { useTranslation } from "react-i18next";
-import mockData from "./mockData.json";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -67,13 +73,6 @@ interface Certificate {
   updatedAt: string;
 }
 
-interface Group {
-  id: string;
-  name: string;
-  parentId: string | null;
-  certificates: Certificate[];
-}
-
 const CertificateExplorer: React.FC = () => {
   const { t } = useTranslation();
   const { message: messageApi } = App.useApp();
@@ -86,24 +85,24 @@ const CertificateExplorer: React.FC = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [form] = Form.useForm();
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
-  const [groups, setGroups] = useState(mockData.groups);
-  const [certificates, setCertificates] = useState(mockData.certificates);
   const [editingGroup, setEditingGroup] = useState<any>(null);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // const { data: groupsData } = useGroups();
-  // const { data: certificatesData } = useCertificates();
-  // const createGroup = useCreateGroup();
-  // const deleteGroup = useDeleteGroup();
-  // const createCertificate = useCreateCertificate();
-  // const deleteCertificate = useDeleteCertificate();
+  const { data: groupsData, isLoading: isGroupsLoading } = useGroups();
+  const { data: certificatesData, refetch: refetchCertificates } =
+    useCertificates();
+  const createGroup = useCreateGroup();
+  const updateGroup = useUpdateGroup();
+  const deleteGroup = useDeleteGroup();
+  const createCertificate = useCreateCertificate();
+  const deleteCertificate = useDeleteCertificate();
 
   const buildGroupTree = (groups: any[]): GroupNode[] => {
     const groupMap = new Map();
     const tree: GroupNode[] = [];
 
-    groups.forEach((group) => {
+    groups?.forEach((group) => {
       groupMap.set(group.id, {
         key: group.id,
         title: group.groupName,
@@ -111,7 +110,7 @@ const CertificateExplorer: React.FC = () => {
       });
     });
 
-    groups.forEach((group) => {
+    groups?.forEach((group) => {
       const node = groupMap.get(group.id);
       if (group.parentId) {
         const parent = groupMap.get(group.parentId);
@@ -127,65 +126,53 @@ const CertificateExplorer: React.FC = () => {
   };
 
   const hasCertificates = (groupId: string) => {
-    return certificates.some((cert) => cert.groupId === groupId);
+    return certificatesData?.data.some(
+      (cert: Certificate) => cert.groupId === groupId,
+    );
   };
 
   const hasChildGroups = (groupId: string) => {
-    return groups.some((group) => group.parentId === groupId);
+    return groupsData?.data.some((group: any) => group.parentId === groupId);
   };
 
   const handleCreateGroup = async (values: any) => {
     try {
-      const newGroup = {
-        id: String(groups.length + 1),
+      await createGroup.mutateAsync({
         groupName: values.groupName,
-        parentId: selectedGroup || null,
-        path: selectedGroup
-          ? `/${selectedGroup}/${groups.length + 1}`
-          : `/${groups.length + 1}`,
-        level: selectedGroup ? 2 : 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setGroups([...groups, newGroup]);
+        parentId: selectedGroup || undefined,
+      });
       messageApi.success(t("common.success"));
       setIsCreateGroupModalVisible(false);
       form.resetFields();
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.error"));
     }
   };
 
   const handleEditGroup = async (values: any) => {
+    if (!editingGroup) return;
     try {
-      setGroups(
-        groups.map((group) =>
-          group.id === editingGroup.id
-            ? {
-                ...group,
-                groupName: values.groupName,
-                updatedAt: new Date().toISOString(),
-              }
-            : group,
-        ),
-      );
+      await updateGroup.mutateAsync({
+        id: editingGroup.id,
+        data: {
+          groupName: values.groupName,
+        },
+      });
       messageApi.success(t("common.success"));
       setIsEditGroupModalVisible(false);
       form.resetFields();
       setEditingGroup(null);
-    } catch (error) {
+    } catch {
       messageApi.error(t("common.error"));
     }
   };
 
   const handleCreateCertificate = async (values: any) => {
     if (!selectedGroup || !selectedTemplate) return;
-
     const template = certificateTemplates.find(
       (t) => t.id === selectedTemplate,
     );
     if (!template) return;
-
     const certificateData = template.fields.map((field) => ({
       key: field.key,
       values: [
@@ -197,30 +184,26 @@ const CertificateExplorer: React.FC = () => {
         },
       ],
     }));
-
     try {
-      const newCertificate = {
-        id: String(certificates.length + 1),
+      await createCertificate.mutateAsync({
         groupId: selectedGroup,
         certificateType: template.id,
         certificateData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setCertificates([...certificates, newCertificate]);
+      });
       messageApi.success(t("common.success"));
       setIsCreateCertificateModalVisible(false);
       form.resetFields();
       setSelectedTemplate(null);
       setPreviewData({});
-    } catch (error) {
+      refetchCertificates();
+    } catch {
       messageApi.error(t("common.error"));
     }
   };
 
   const handleDeleteGroup = async (groupId: string) => {
     try {
-      setGroups(groups.filter((group) => group.id !== groupId));
+      await deleteGroup.mutateAsync(groupId);
       messageApi.success(t("common.success"));
     } catch (error) {
       messageApi.error(t("common.error"));
@@ -229,9 +212,10 @@ const CertificateExplorer: React.FC = () => {
 
   const handleDeleteCertificate = async (certificateId: string) => {
     try {
-      setCertificates(certificates.filter((cert) => cert.id !== certificateId));
+      await deleteCertificate.mutateAsync(certificateId);
       messageApi.success(t("common.success"));
-    } catch (error) {
+      refetchCertificates();
+    } catch {
       messageApi.error(t("common.error"));
     }
   };
@@ -254,7 +238,7 @@ const CertificateExplorer: React.FC = () => {
   };
 
   const getGroupMenuItems = (node: GroupNode): MenuProps["items"] => {
-    const group = groups.find((g) => g.id === node.key);
+    const group = groupsData?.data.find((g: any) => g.id === node.key);
     if (!group) return [];
 
     const items: MenuProps["items"] = [];
@@ -328,32 +312,66 @@ const CertificateExplorer: React.FC = () => {
   };
 
   const getChildGroups = (groupId: string) => {
-    return groups.filter((group) => group.parentId === groupId);
+    return (
+      groupsData?.data.filter((group: any) => group.parentId === groupId) || []
+    );
   };
 
   const handleGroupSelect = (selectedKeys: React.Key[]) => {
     setSelectedGroup(selectedKeys[0] as string);
   };
 
-  const filteredCertificates = certificates.filter((cert) => {
-    const matchesSearch = cert.certificateType
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-    const matchesGroup = selectedGroup ? cert.groupId === selectedGroup : true;
-    return matchesSearch && matchesGroup;
-  });
+  const filteredCertificates =
+    certificatesData?.data.filter((cert: Certificate) => {
+      const matchesSearch = cert.certificateType
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+      const matchesGroup = selectedGroup
+        ? cert.groupId === selectedGroup
+        : true;
+      return matchesSearch && matchesGroup;
+    }) || [];
 
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider width={300} style={{ padding: "8px" }}>
-        <Tree
-          treeData={renderTreeNodes(buildGroupTree(groups))}
-          onSelect={handleGroupSelect}
-          defaultExpandAll
-        />
+        {isGroupsLoading ? (
+          <div style={{ textAlign: "center", padding: "24px" }}>
+            <Spin />
+          </div>
+        ) : !groupsData?.data || groupsData.data.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "24px" }}>
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={t("common.noGroups")}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setIsCreateGroupModalVisible(true)}
+              style={{ marginTop: "16px" }}
+            >
+              {t("common.createFirstGroup")}
+            </Button>
+          </div>
+        ) : (
+          <Tree
+            treeData={renderTreeNodes(buildGroupTree(groupsData.data))}
+            onSelect={handleGroupSelect}
+            defaultExpandAll
+          />
+        )}
       </Sider>
       <Divider type="vertical" style={{ height: "100vh", margin: 0 }} />
       <Content style={{ padding: "16px" }}>
+        {!selectedGroup && groupsData?.data && groupsData.data.length > 0 && (
+          <div style={{ textAlign: "center", padding: "24px" }}>
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={t("common.selectGroup")}
+            />
+          </div>
+        )}
         {selectedGroup && (
           <>
             {hasChildGroups(selectedGroup) ? (
@@ -366,7 +384,7 @@ const CertificateExplorer: React.FC = () => {
                     gap: "16px",
                   }}
                 >
-                  {getChildGroups(selectedGroup).map((group) => (
+                  {getChildGroups(selectedGroup).map((group: any) => (
                     <Card
                       key={group.id}
                       hoverable
@@ -383,10 +401,8 @@ const CertificateExplorer: React.FC = () => {
             ) : (
               <CertificateManagement
                 groupId={selectedGroup}
-                certificates={certificates.filter(
-                  (cert) => cert.groupId === selectedGroup,
-                )}
-                onCertificatesChange={setCertificates}
+                certificates={filteredCertificates}
+                onCertificatesChange={() => refetchCertificates()}
               />
             )}
           </>
@@ -408,7 +424,11 @@ const CertificateExplorer: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={createGroup.isPending}
+            >
               {t("common.create")}
             </Button>
           </Form.Item>
@@ -433,7 +453,11 @@ const CertificateExplorer: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={updateGroup.isPending}
+            >
               {t("common.update")}
             </Button>
           </Form.Item>
@@ -511,7 +535,11 @@ const CertificateExplorer: React.FC = () => {
                   ))}
 
               <Form.Item>
-                <Button type="primary" htmlType="submit">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={createCertificate.isPending}
+                >
                   {t("common.create")}
                 </Button>
               </Form.Item>

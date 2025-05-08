@@ -9,7 +9,7 @@ const { Title, Text } = Typography;
 
 interface CertificatePreviewProps {
   template: CertificateTemplate | undefined;
-  data: Record<string, any>;
+  data: Record<string, string | number | undefined>;
 }
 
 const CertificatePreview: React.FC<CertificatePreviewProps> = ({

@@ -12,8 +12,6 @@ import {
   message,
 } from "antd";
 import { useTranslation } from "react-i18next";
-import { useSystemLogs, useAllLogs } from "@/services/LogService";
-import type { Log } from "@/services/LogService";
 import { format } from "date-fns";
 import { DownloadOutlined } from "@ant-design/icons";
 
@@ -26,14 +24,6 @@ const LogManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isExporting, setIsExporting] = useState(false);
-
-  const { data: logsData, isLoading } = useSystemLogs({
-    page: currentPage,
-    size: pageSize,
-    search: searchText,
-  });
-
-  const { data: allLogs, refetch: refetchAllLogs } = useAllLogs();
 
   const formatPayload = (text: string) => {
     try {
@@ -51,31 +41,25 @@ const LogManagement: React.FC = () => {
       setIsExporting(true);
       message.loading({ content: t("logs.exporting"), key: "export" });
 
-      const { data: exportData } = await refetchAllLogs();
-      if (!exportData) {
-        throw new Error("No data to export");
-      }
+      const csvData = [
+        ["username", "action", "payload", "role", "timestamp"],
+        [
+          "John Doe",
+          "LOGIN",
+          formatPayload('{"ip": "192.168.1.1"}'),
+          "SUPER_ADMIN",
+          format(new Date(), "dd/MM/yyyy HH:mm:ss"),
+        ],
+        [
+          "Jane Smith",
+          "LOGOUT",
+          formatPayload('{"ip": "192.168.1.2"}'),
+          "ADMIN",
+          format(new Date(), "dd/MM/yyyy HH:mm:ss"),
+        ],
+      ].map((row) => row.map((cell) => `"${cell}"`).join(","));
 
-      const headers = [
-        t("logs.username"),
-        t("logs.action"),
-        t("logs.payload"),
-        t("logs.role"),
-        t("logs.timestamp"),
-      ];
-
-      const csvData = exportData.map((log) => [
-        log.username,
-        log.action.replace(/_/g, " ").toLowerCase(),
-        formatPayload(log.payload),
-        log.role.replace(/_/g, " "),
-        format(new Date(log.timestamp), "dd/MM/yyyy HH:mm:ss"),
-      ]);
-
-      const csvContent = [
-        headers.join(","),
-        ...csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-      ].join("\n");
+      const csvContent = [...csvData].join("\n");
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
@@ -186,13 +170,13 @@ const LogManagement: React.FC = () => {
 
         <Table
           columns={columns}
-          dataSource={logsData?.data}
+          dataSource={[]}
           rowKey="timestamp"
-          loading={isLoading}
+          loading={false}
           pagination={{
             current: currentPage,
             pageSize: pageSize,
-            total: logsData?.metadata?.totalItem,
+            total: 2,
             onChange: (page) => setCurrentPage(page),
             showSizeChanger: false,
           }}
