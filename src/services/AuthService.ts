@@ -349,3 +349,17 @@ export const useResetPasswordWithToken = () => {
       }),
   });
 };
+
+export const useResetPasswordOrganizationByAdmin = () => {
+  return useMutation({
+    mutationFn: (data: ResetPasswordByAdminRequestDto) =>
+      AuthService.resetPasswordOrganizationByAdmin(data),
+  });
+};
+
+export const useUnlockOrganizationAccount = () => {
+  return useMutation({
+    mutationFn: (organizationId: string) =>
+      AuthService.unlockOrganizationAccount(organizationId),
+  });
+};

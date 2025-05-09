@@ -1,19 +1,20 @@
 "use client";
-
-import { Box } from "@/components/Elements";
-import { ReactNode, Suspense } from "react";
+import { App } from "antd";
+import { ReactNode, useState, useEffect, Suspense } from "react";
+import Loader from "@/components/Elements/Loader";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        width: "100vw",
-      }}
-    >
-      <Suspense>{children}</Suspense>
-    </Box>
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const content = isClient ? (
+    <Suspense fallback={<Loader />}>{children}</Suspense>
+  ) : (
+    <Loader />
   );
+
+  return <App>{content}</App>;
 }

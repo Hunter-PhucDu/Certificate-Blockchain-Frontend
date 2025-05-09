@@ -1,7 +1,16 @@
 "use client";
 
-import OrganizationLogin from "@/features/auth/organizationLogin/OrganizationLogin";
+import dynamic from "next/dynamic";
+import Loader from "@/components/Elements/Loader";
 
-export default function OrganizationLoginPage() {
-  return <OrganizationLogin />;
+const DynamicLogin = dynamic(
+  () => import("@/features/auth/organizationLogin/OrganizationLogin"),
+  {
+    ssr: false,
+    loading: () => <Loader />,
+  },
+);
+
+export default function LoginPage() {
+  return <DynamicLogin />;
 }

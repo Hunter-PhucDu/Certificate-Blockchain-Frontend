@@ -37,10 +37,23 @@ export interface UpdateCertificateBody {
   certificateData: CertificateData[];
 }
 
+export interface CertificateTypeStatistics {
+  type: string;
+  count: number;
+}
+
+export interface CertificateStatistics {
+  total: number;
+  issued: number;
+  pending: number;
+  revoked: number;
+}
+
 const CERTIFICATE_ENDPOINTS = {
   CERTIFICATES: "/certificates",
   CERTIFICATE: (id: string) => `/certificates/${id}`,
   CERTIFICATE_BY_TX: (txHash: string) => `/certificates/tx/${txHash}`,
+  STATISTICS: "/certificates/dashboard/statistics",
 };
 
 export const CertificateService = {
@@ -85,6 +98,13 @@ export const CertificateService = {
   deleteCertificate: (id: string) => {
     return apiService.delete<ApiResponse<void>>(
       CERTIFICATE_ENDPOINTS.CERTIFICATE(id),
+    );
+  },
+
+  // Get certificate statistics
+  getStatistics: () => {
+    return apiService.get<ApiResponse<CertificateStatistics>>(
+      CERTIFICATE_ENDPOINTS.STATISTICS,
     );
   },
 };
@@ -148,5 +168,12 @@ export const useDeleteCertificate = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["certificates"] });
     },
+  });
+};
+
+export const useCertificateStatistics = () => {
+  return useQuery({
+    queryKey: ["certificates", "statistics"],
+    queryFn: () => CertificateService.getStatistics(),
   });
 };

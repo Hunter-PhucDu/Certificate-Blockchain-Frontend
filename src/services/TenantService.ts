@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse, PaginatedResponse } from "./api/types";
 
 export interface Tenant {
+  id: string;
   organizationName: string;
   tenantName: string;
   subdomain: string;
@@ -29,10 +30,19 @@ export interface TenantListParams {
   search?: string;
 }
 
+export interface TenantStatistics {
+  totalTenants: number;
+  activeTenants: number;
+  suspendedTenants: number;
+  unusedTenants: number;
+}
+
 const TENANT_ENDPOINTS = {
   TENANTS: "/tenants",
   TENANT: (id: string) => `/tenants/${id}`,
   SEARCH_TENANTS: "/tenants/search",
+  UNUSED_TENANTS: "/tenants/unused",
+  STATISTICS: "/tenants/dashboard/statistics",
 };
 
 export const TenantService = {
@@ -74,6 +84,20 @@ export const TenantService = {
   // Delete tenant
   deleteTenant: (id: string) => {
     return apiService.delete<ApiResponse<void>>(TENANT_ENDPOINTS.TENANT(id));
+  },
+
+  // Get all unused tenants
+  getUnusedTenants: () => {
+    return apiService.get<ApiResponse<Tenant[]>>(
+      TENANT_ENDPOINTS.UNUSED_TENANTS,
+    );
+  },
+
+  // Get tenant statistics
+  getStatistics: () => {
+    return apiService.get<ApiResponse<TenantStatistics>>(
+      TENANT_ENDPOINTS.STATISTICS,
+    );
   },
 };
 
@@ -132,5 +156,19 @@ export const useDeleteTenant = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
     },
+  });
+};
+
+export const useUnusedTenants = () => {
+  return useQuery({
+    queryKey: ["tenants", "unused"],
+    queryFn: () => TenantService.getUnusedTenants(),
+  });
+};
+
+export const useTenantStatistics = () => {
+  return useQuery({
+    queryKey: ["tenants", "statistics"],
+    queryFn: () => TenantService.getStatistics(),
   });
 };

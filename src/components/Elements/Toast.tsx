@@ -4,8 +4,6 @@ import React from "react";
 import { notification } from "antd";
 import { createContext, useContext } from "react";
 
-type ToastType = "success" | "error" | "info" | "warning";
-
 interface ToastContextType {
   toast: {
     success: (message: string) => void;

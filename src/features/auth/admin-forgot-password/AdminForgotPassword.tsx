@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Form, Input, Button, Card, Typography, Steps } from "antd";
+import { Form, Input, Button, Card, Typography, Steps, Row } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import {
   OtpForgotPasswordRequestDto,
   useAdminGetOtpForgotPassword,
@@ -17,17 +16,14 @@ const { Title, Paragraph } = Typography;
 
 const steps = [
   {
-    title: "Nhập email",
-    description: "Nhập email của bạn",
+    title: "Get OTP",
   },
   {
-    title: "Xác thực OTP",
-    description: "Nhập mã OTP",
+    title: "Verify OTP",
   },
 ];
 
 const AdminForgotPasswordPage = () => {
-  const { t } = useTranslation();
   const router = useRouter();
   const [emailForm] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
@@ -41,21 +37,19 @@ const AdminForgotPasswordPage = () => {
   const handleRequestOtp = async (values: OtpForgotPasswordRequestDto) => {
     getOtpMutation.mutate(values, {
       onSuccess: () => {
-        toast.success("Mã OTP đã được gửi đến email của bạn");
+        toast.success("OTP code has been sent to your email");
         setEmail(values.email);
         setCurrentStep(1);
       },
-      onError: (error: any) => {
-        toast.error(
-          error?.response?.data?.message || "Có lỗi xảy ra khi gửi mã OTP",
-        );
+      onError: () => {
+        toast.error("An error occurred while sending the OTP code.");
       },
     });
   };
 
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) {
-      toast.error("Vui lòng nhập đủ 6 số OTP");
+      toast.error("Please enter full 6 OTP digits");
       return;
     }
 
@@ -63,10 +57,10 @@ const AdminForgotPasswordPage = () => {
       { otp, email },
       {
         onSuccess: () => {
-          toast.success("Xác thực OTP thành công");
+          toast.success("OTP authentication successful");
         },
-        onError: (error: any) => {
-          toast.error(error?.response?.data?.message || "Mã OTP không hợp lệ");
+        onError: () => {
+          toast.error("Invalid OTP code");
         },
       },
     );
@@ -84,13 +78,13 @@ const AdminForgotPasswordPage = () => {
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: t("common.emailRequired") },
-                { type: "email", message: t("common.invalidEmail") },
+                { required: true, message: "Please input your email!" },
+                { type: "email", message: "Please enter a valid email!" },
               ]}
             >
               <Input
                 prefix={<MailOutlined />}
-                placeholder={t("common.email")}
+                placeholder="Email"
                 size="large"
               />
             </Form.Item>
@@ -103,7 +97,7 @@ const AdminForgotPasswordPage = () => {
                 block
                 loading={getOtpMutation.isPending}
               >
-                {t("common.sendOtp")}
+                Send OTP
               </Button>
             </Form.Item>
 
@@ -113,7 +107,7 @@ const AdminForgotPasswordPage = () => {
                 block
                 onClick={() => router.push("/admin-login")}
               >
-                {t("common.backToLogin")}
+                Back to Login
               </Button>
             </Form.Item>
           </Form>
@@ -136,7 +130,7 @@ const AdminForgotPasswordPage = () => {
                 loading={sendLinkMutation.isPending}
                 onClick={handleVerifyOtp}
               >
-                {t("common.sendResetLink")}
+                Verify OTP
               </Button>
             </Form.Item>
           </div>
@@ -147,14 +141,21 @@ const AdminForgotPasswordPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-5">
+    <Row
+      justify="center"
+      align="middle"
+      style={{
+        minHeight: "100vh",
+        background: "url('/login-bg.jpg') no-repeat center/cover",
+      }}
+    >
       <Card className="w-full max-w-[450px]">
         <div className="text-center mb-6">
           <Title level={2} className="mb-2 font-semibold">
-            {t("common.forgotPassword")}
+            Forgot Password
           </Title>
           <Paragraph type="secondary">
-            Khôi phục mật khẩu quản trị viên của bạn
+            Recover your administrator password
           </Paragraph>
         </div>
 
@@ -162,7 +163,7 @@ const AdminForgotPasswordPage = () => {
 
         <div className="mt-8">{renderStepContent()}</div>
       </Card>
-    </div>
+    </Row>
   );
 };
 

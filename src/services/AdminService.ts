@@ -5,8 +5,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse, PaginatedResponse } from "./api/types";
 
 export interface Admin {
+  id: string;
   username: string;
   email: string;
+  role: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,8 +65,11 @@ export const AdminService = {
   },
 
   // Update admin
-  updateAdmin: (data: AdminUpdateBody) => {
-    return apiService.patch<ApiResponse<Admin>>(ADMIN_ENDPOINTS.ADMINS, data);
+  updateAdmin: (id: string, data: AdminUpdateBody) => {
+    return apiService.patch<ApiResponse<Admin>>(
+      ADMIN_ENDPOINTS.ADMIN(id),
+      data,
+    );
   },
 
   // Delete admin
@@ -111,7 +116,8 @@ export const useUpdateAdmin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: AdminUpdateBody) => AdminService.updateAdmin(data),
+    mutationFn: (data: { adminId: string; data: AdminUpdateBody }) =>
+      AdminService.updateAdmin(data.adminId, data.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin"] });
       queryClient.invalidateQueries({ queryKey: ["admins"] });
