@@ -11,7 +11,6 @@ import {
   Popconfirm,
   Tooltip,
   Input,
-  Form,
 } from "antd";
 import {
   PlusOutlined,
@@ -29,12 +28,9 @@ import CertificatePreview from "./CertificatePreview";
 import CertificateCreate from "./CertificateCreate";
 import { App } from "antd";
 import {
-  useCreateCertificate,
   useDeleteCertificate,
-  useUpdateCertificate,
   useCertificates,
   Certificate,
-  CertificateData,
 } from "@/services/CertificateService";
 import type { FormInstance } from "antd";
 
@@ -50,7 +46,6 @@ interface CertificateManagementProps {
 const CertificateManagement: React.FC<CertificateManagementProps> = ({
   groupId,
   certificates,
-  onCertificatesChange,
   form,
 }) => {
   const { t } = useTranslation();
@@ -64,42 +59,7 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
 
   const { refetch: refetchCertificates } = useCertificates();
-  const createCertificate = useCreateCertificate();
   const deleteCertificate = useDeleteCertificate();
-  const updateCertificate = useUpdateCertificate();
-
-  const handleCreateCertificate = async (values: any) => {
-    try {
-      await createCertificate.mutateAsync({
-        groupId,
-        certificateType: values.certificateType,
-        certificateData: values.certificateData,
-      });
-      messageApi.success(t("common.certificates.createSuccess"));
-      setIsModalVisible(false);
-      refetchCertificates();
-    } catch {
-      messageApi.error(t("common.certificates.error"));
-    }
-  };
-
-  const handleEditCertificate = async (values: any) => {
-    try {
-      if (!editingCertificate) return;
-      await updateCertificate.mutateAsync({
-        id: editingCertificate.id,
-        data: {
-          certificateData: values.certificateData,
-        },
-      });
-      messageApi.success(t("common.certificates.updateSuccess"));
-      setIsModalVisible(false);
-      refetchCertificates();
-    } catch {
-      messageApi.error(t("common.certificates.error"));
-    }
-  };
-
   const handleDeleteCertificate = async (certificateId: string) => {
     try {
       await deleteCertificate.mutateAsync(certificateId);

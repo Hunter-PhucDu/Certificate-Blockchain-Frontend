@@ -2,8 +2,8 @@ import { createInstance } from "i18next";
 import { getOptions } from "./settings";
 
 // Import language resources
-import en from "./locales/en/common.json";
-import vi from "./locales/vi/common.json";
+import en from "./locales/en/en.json";
+import vi from "./locales/vi/vi.json";
 
 const resources = {
   en: { common: en },

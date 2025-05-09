@@ -42,6 +42,7 @@ const OrganizationDashboard: React.FC = () => {
     payload,
   }: {
     active?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any[];
   }) => {
     if (active && payload && payload.length) {

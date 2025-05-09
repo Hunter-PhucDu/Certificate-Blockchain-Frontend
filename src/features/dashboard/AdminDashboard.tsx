@@ -52,6 +52,7 @@ const AdminDashboard: React.FC = () => {
   const activeTenants = tenantStats?.data?.activeTenants || 0;
   const unusedTenants = tenantStats?.data?.unusedTenants || 0;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (

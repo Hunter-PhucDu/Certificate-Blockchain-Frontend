@@ -33,12 +33,9 @@ import {
   useUpdateGroup,
 } from "@/services/GroupService";
 import {
-  CertificateValueType,
   useCertificates,
   useCreateCertificate,
-  useDeleteCertificate,
   Certificate,
-  CertificateData,
 } from "@/services/CertificateService";
 import {
   certificateTemplates,
@@ -74,7 +71,7 @@ const CertificateExplorer: React.FC = () => {
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
   const [editingGroup, setEditingGroup] = useState<any>(null);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [searchText] = useState("");
 
   const { data: groupsData, isLoading: isGroupsLoading } = useGroups();
   const { data: certificatesData, refetch: refetchCertificates } =
@@ -83,7 +80,6 @@ const CertificateExplorer: React.FC = () => {
   const updateGroup = useUpdateGroup();
   const deleteGroup = useDeleteGroup();
   const createCertificate = useCreateCertificate();
-  const deleteCertificate = useDeleteCertificate();
 
   const buildGroupTree = (groups: any[]): GroupNode[] => {
     const groupMap = new Map();
@@ -192,16 +188,6 @@ const CertificateExplorer: React.FC = () => {
     try {
       await deleteGroup.mutateAsync(groupId);
       messageApi.success(t("common.success"));
-    } catch (error) {
-      messageApi.error(t("common.error"));
-    }
-  };
-
-  const handleDeleteCertificate = async (certificateId: string) => {
-    try {
-      await deleteCertificate.mutateAsync(certificateId);
-      messageApi.success(t("common.success"));
-      refetchCertificates();
     } catch {
       messageApi.error(t("common.error"));
     }
