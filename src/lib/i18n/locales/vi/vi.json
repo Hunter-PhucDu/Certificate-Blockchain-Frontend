@@ -16,6 +16,12 @@
     "sendOtp": "Gửi mã OTP",
     "sendResetLink": "Gửi link đặt lại mật khẩu",
     "organizationLogin": "Đăng nhập tổ chức",
+    "preview": "Xem trước",
+    "selectTemplate": "Chọn mẫu",
+    "createGroup": "Tạo nhóm",
+    "groupName": "Tên nhóm",
+    "edit": "Chỉnh sửa",
+    "selectGroup": "Chọn nhóm",
     "certificates": {
       "title": "Quản lý Chứng chỉ",
       "list": "Danh sách Chứng chỉ",
@@ -37,7 +43,6 @@
       "selectTemplateType": "Chọn loại mẫu",
       "predefinedTemplate": "Mẫu có sẵn",
       "customTemplate": "Mẫu tùy chỉnh",
-      "selectTemplate": "Chọn mẫu",
       "addField": "Thêm trường",
       "fieldLabel": "Nhãn trường",
       "fieldType": "Loại trường",
@@ -62,9 +67,9 @@
       "enterOptions": "Nhập các tùy chọn",
       "certificateData": "Dữ liệu chứng chỉ",
       "addSubGroup": "Thêm nhóm con",
-      "groupName": "Tên nhóm",
-      "createGroup": "Tạo nhóm",
-      "editGroup": "Chỉnh sửa nhóm"
+      "noGroups": "Chưa có nhóm nào",
+      "createFirstGroup": "Tạo nhóm đầu tiên của bạn",
+      "selectGroup": "Chọn một nhóm để xem chứng chỉ"
     },
     "logManagement": "Quản lý nhật ký",
     "users": {
@@ -135,6 +140,7 @@
     "create": "Tạo mới",
     "update": "Cập nhật",
     "cancel": "Hủy",
+    "delete": "Xóa",
     "upload": "Tải lên",
     "changePassword": {
       "title": "Đổi mật khẩu",

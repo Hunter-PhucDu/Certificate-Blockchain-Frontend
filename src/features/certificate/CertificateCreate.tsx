@@ -26,6 +26,7 @@ import {
   CertificateValueType,
 } from "@/services/CertificateService";
 import { Certificate } from "@/services/CertificateService";
+import type { FormInstance } from "antd";
 
 const { Title } = Typography;
 
@@ -34,6 +35,7 @@ interface CertificateCreateProps {
   onCancel: () => void;
   groupId: string;
   editingCertificate: Certificate | null;
+  form: FormInstance;
 }
 
 interface CustomField {
@@ -49,10 +51,10 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
   onCancel,
   groupId,
   editingCertificate,
+  form,
 }) => {
   const { t } = useTranslation();
   const { message: messageApi } = App.useApp();
-  const [form] = Form.useForm();
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [isCustomTemplate, setIsCustomTemplate] = useState(false);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);

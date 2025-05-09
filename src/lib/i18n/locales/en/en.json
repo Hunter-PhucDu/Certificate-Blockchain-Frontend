@@ -16,6 +16,12 @@
     "sendOtp": "Send OTP",
     "sendResetLink": "Send reset link",
     "organizationLogin": "Organization Login",
+    "preview": "Preview",
+    "selectTemplate": "Select Template",
+    "createGroup": "Create Group",
+    "groupName": "Group Name",
+    "edit": "Edit",
+    "selectGroup": "Select Group",
     "certificates": {
       "title": "Certificate Management",
       "list": "Certificate List",
@@ -37,7 +43,6 @@
       "selectTemplateType": "Select template type",
       "predefinedTemplate": "Predefined Template",
       "customTemplate": "Custom Template",
-      "selectTemplate": "Select template",
       "addField": "Add Field",
       "fieldLabel": "Field Label",
       "fieldType": "Field Type",
@@ -62,9 +67,9 @@
       "enterOptions": "Enter options",
       "certificateData": "Certificate Data",
       "addSubGroup": "Add Subgroup",
-      "groupName": "Group Name",
-      "createGroup": "Create Group",
-      "editGroup": "Edit Group"
+      "noGroups": "No groups available",
+      "createFirstGroup": "Create your first group",
+      "selectGroup": "Select a group to view certificates"
     },
     "logManagement": "Log Management",
     "users": {
@@ -135,6 +140,7 @@
     "create": "Create",
     "update": "Update",
     "cancel": "Cancel",
+    "delete": "Delete",
     "upload": "Upload",
     "changePassword": {
       "title": "Change Password",

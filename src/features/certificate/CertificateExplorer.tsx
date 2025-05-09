@@ -69,7 +69,8 @@ const CertificateExplorer: React.FC = () => {
   const [isCreateCertificateModalVisible, setIsCreateCertificateModalVisible] =
     useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [form] = Form.useForm();
+  const [groupForm] = Form.useForm();
+  const [certificateForm] = Form.useForm();
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
   const [editingGroup, setEditingGroup] = useState<any>(null);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
@@ -129,7 +130,7 @@ const CertificateExplorer: React.FC = () => {
       });
       messageApi.success(t("common.success"));
       setIsCreateGroupModalVisible(false);
-      form.resetFields();
+      groupForm.resetFields();
     } catch {
       messageApi.error(t("common.error"));
     }
@@ -146,7 +147,7 @@ const CertificateExplorer: React.FC = () => {
       });
       messageApi.success(t("common.success"));
       setIsEditGroupModalVisible(false);
-      form.resetFields();
+      groupForm.resetFields();
       setEditingGroup(null);
     } catch {
       messageApi.error(t("common.error"));
@@ -178,7 +179,7 @@ const CertificateExplorer: React.FC = () => {
       });
       messageApi.success(t("common.success"));
       setIsCreateCertificateModalVisible(false);
-      form.resetFields();
+      certificateForm.resetFields();
       setSelectedTemplate(null);
       setPreviewData({});
       refetchCertificates();
@@ -214,7 +215,7 @@ const CertificateExplorer: React.FC = () => {
       template.fields.forEach((field) => {
         initialValues[field.key] = "";
       });
-      form.setFieldsValue(initialValues);
+      certificateForm.setFieldsValue(initialValues);
       setPreviewData(initialValues);
     }
   };
@@ -247,7 +248,7 @@ const CertificateExplorer: React.FC = () => {
       icon: <EditOutlined />,
       onClick: () => {
         setEditingGroup(group);
-        form.setFieldsValue({ groupName: group.groupName });
+        groupForm.setFieldsValue({ groupName: group.groupName });
         setIsEditGroupModalVisible(true);
       },
     });
@@ -389,6 +390,7 @@ const CertificateExplorer: React.FC = () => {
                 groupId={selectedGroup}
                 certificates={filteredCertificates}
                 onCertificatesChange={() => refetchCertificates()}
+                form={certificateForm}
               />
             )}
           </>
@@ -401,7 +403,7 @@ const CertificateExplorer: React.FC = () => {
         onCancel={() => setIsCreateGroupModalVisible(false)}
         footer={null}
       >
-        <Form form={form} onFinish={handleCreateGroup}>
+        <Form form={groupForm} onFinish={handleCreateGroup}>
           <Form.Item
             name="groupName"
             label={t("common.groupName")}
@@ -430,7 +432,7 @@ const CertificateExplorer: React.FC = () => {
         }}
         footer={null}
       >
-        <Form form={form} onFinish={handleEditGroup}>
+        <Form form={groupForm} onFinish={handleEditGroup}>
           <Form.Item
             name="groupName"
             label={t("common.groupName")}
@@ -470,7 +472,7 @@ const CertificateExplorer: React.FC = () => {
         >
           <div>
             <Form
-              form={form}
+              form={certificateForm}
               onFinish={handleCreateCertificate}
               onValuesChange={handleFormValuesChange}
               layout="vertical"

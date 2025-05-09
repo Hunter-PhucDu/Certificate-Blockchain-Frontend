@@ -11,6 +11,7 @@ import {
   Popconfirm,
   Tooltip,
   Input,
+  Form,
 } from "antd";
 import {
   PlusOutlined,
@@ -35,19 +36,22 @@ import {
   Certificate,
   CertificateData,
 } from "@/services/CertificateService";
+import type { FormInstance } from "antd";
 
 const { Title } = Typography;
 
 interface CertificateManagementProps {
   groupId: string;
   certificates: Certificate[];
-  onCertificatesChange: (certificates: Certificate[]) => void;
+  onCertificatesChange: () => void;
+  form: FormInstance;
 }
 
 const CertificateManagement: React.FC<CertificateManagementProps> = ({
   groupId,
   certificates,
   onCertificatesChange,
+  form,
 }) => {
   const { t } = useTranslation();
   const { message: messageApi } = App.useApp();
@@ -226,9 +230,11 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
         onCancel={() => {
           setIsModalVisible(false);
           setEditingCertificate(null);
+          form.resetFields();
         }}
         groupId={groupId}
         editingCertificate={editingCertificate}
+        form={form}
       />
 
       <Modal
