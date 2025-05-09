@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next";
 import {
   certificateTemplates,
   CertificateTemplate,
-} from "@/configs/certificateTemplates";
+} from "@/features/certificate/certificateTemplates";
 import CertificatePreview from "./CertificatePreview";
 import CertificateCreate from "./CertificateCreate";
 import { App } from "antd";
@@ -32,26 +32,11 @@ import {
   useDeleteCertificate,
   useUpdateCertificate,
   useCertificates,
+  Certificate,
+  CertificateData,
 } from "@/services/CertificateService";
 
 const { Title } = Typography;
-
-interface Certificate {
-  id: string;
-  groupId: string;
-  certificateType: string;
-  certificateData: Array<{
-    key: string;
-    values: Array<{
-      label: string;
-      value: string;
-      type: string;
-      isUnique?: boolean;
-    }>;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface CertificateManagementProps {
   groupId: string;
@@ -242,6 +227,8 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
           setIsModalVisible(false);
           setEditingCertificate(null);
         }}
+        groupId={groupId}
+        editingCertificate={editingCertificate}
       />
 
       <Modal

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, Typography, Space, Divider } from "antd";
-import { CertificateTemplate } from "@/configs/certificateTemplates";
+import { CertificateTemplate } from "@/features/certificate/certificateTemplates";
 import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;

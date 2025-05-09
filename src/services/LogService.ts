@@ -11,6 +11,16 @@ export interface Log {
   timestamp: string;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  metadata: {
+    totalItem: number;
+    totalPage: number;
+    currentPage: number;
+    pageSize: number;
+  };
+}
+
 export interface LogListParams {
   page: number;
   size: number;

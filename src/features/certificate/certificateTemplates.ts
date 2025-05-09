@@ -1,7 +1,9 @@
+import { CertificateValueType } from "@/services/CertificateService";
+
 export interface CertificateField {
   key: string;
   label: string;
-  type: "text" | "number" | "date" | "select";
+  type: CertificateValueType;
   isUnique?: boolean;
   options?: string[];
 }
@@ -22,29 +24,29 @@ export const certificateTemplates: CertificateTemplate[] = [
       {
         key: "studentName",
         label: "Họ và tên",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
       {
         key: "studentId",
         label: "Mã học sinh",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
       {
         key: "className",
         label: "Lớp",
-        type: "text",
+        type: "String",
       },
       {
         key: "schoolName",
         label: "Trường",
-        type: "text",
+        type: "String",
       },
       {
         key: "issueDate",
         label: "Ngày cấp",
-        type: "date",
+        type: "Date",
       },
     ],
   },
@@ -56,29 +58,29 @@ export const certificateTemplates: CertificateTemplate[] = [
       {
         key: "teacherName",
         label: "Họ và tên",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
       {
         key: "teacherId",
         label: "Mã giáo viên",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
       {
         key: "subject",
         label: "Môn học",
-        type: "text",
+        type: "String",
       },
       {
         key: "schoolName",
         label: "Trường",
-        type: "text",
+        type: "String",
       },
       {
         key: "issueDate",
         label: "Ngày cấp",
-        type: "date",
+        type: "Date",
       },
     ],
   },
@@ -87,15 +89,25 @@ export const certificateTemplates: CertificateTemplate[] = [
     name: "Bằng Cử Nhân",
     description: "Mẫu chứng chỉ bằng cử nhân",
     fields: [
-      { key: "studentName", label: "Họ và tên", type: "text", isUnique: true },
-      { key: "studentId", label: "Mã sinh viên", type: "text", isUnique: true },
-      { key: "major", label: "Chuyên ngành", type: "text" },
-      { key: "graduationYear", label: "Năm tốt nghiệp", type: "number" },
-      { key: "gpa", label: "Điểm trung bình", type: "number" },
+      {
+        key: "studentName",
+        label: "Họ và tên",
+        type: "String",
+        isUnique: true,
+      },
+      {
+        key: "studentId",
+        label: "Mã sinh viên",
+        type: "String",
+        isUnique: true,
+      },
+      { key: "major", label: "Chuyên ngành", type: "String" },
+      { key: "graduationYear", label: "Năm tốt nghiệp", type: "Number" },
+      { key: "gpa", label: "Điểm trung bình", type: "Number" },
       {
         key: "rank",
         label: "Xếp loại",
-        type: "select",
+        type: "String",
         options: ["Xuất sắc", "Giỏi", "Khá", "Trung bình"],
       },
     ],
@@ -108,18 +120,18 @@ export const certificateTemplates: CertificateTemplate[] = [
       {
         key: "recipientName",
         label: "Họ và tên người nhận",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
       {
         key: "certificateId",
         label: "Mã chứng chỉ",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
-      { key: "issueDate", label: "Ngày cấp", type: "date" },
-      { key: "expiryDate", label: "Ngày hết hạn", type: "date" },
-      { key: "issuer", label: "Đơn vị cấp", type: "text" },
+      { key: "issueDate", label: "Ngày cấp", type: "Date" },
+      { key: "expiryDate", label: "Ngày hết hạn", type: "Date" },
+      { key: "issuer", label: "Đơn vị cấp", type: "String" },
     ],
   },
   {
@@ -130,14 +142,19 @@ export const certificateTemplates: CertificateTemplate[] = [
       {
         key: "holderName",
         label: "Họ và tên người được cấp",
-        type: "text",
+        type: "String",
         isUnique: true,
       },
-      { key: "diplomaId", label: "Mã văn bằng", type: "text", isUnique: true },
-      { key: "specialization", label: "Chuyên môn", type: "text" },
-      { key: "issueDate", label: "Ngày cấp", type: "date" },
-      { key: "issuingAuthority", label: "Cơ quan cấp", type: "text" },
-      { key: "validityPeriod", label: "Thời hạn hiệu lực", type: "text" },
+      {
+        key: "diplomaId",
+        label: "Mã văn bằng",
+        type: "String",
+        isUnique: true,
+      },
+      { key: "specialization", label: "Chuyên môn", type: "String" },
+      { key: "issueDate", label: "Ngày cấp", type: "Date" },
+      { key: "issuingAuthority", label: "Cơ quan cấp", type: "String" },
+      { key: "validityPeriod", label: "Thời hạn hiệu lực", type: "String" },
     ],
   },
 ];

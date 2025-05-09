@@ -4,10 +4,12 @@ import { apiService } from "@/lib/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "./api/types";
 
+export type CertificateValueType = "String" | "Number" | "Date" | "Boolean";
+
 export interface CertificateValue {
   label: string;
   value: string;
-  type: string;
+  type: CertificateValueType;
   isUnique?: boolean;
 }
 
@@ -21,7 +23,7 @@ export interface Certificate {
   blockId: string;
   txHash: string;
   groupId: string;
-  certificateType: string;
+  certificateType: CertificateValueType;
   certificateData: CertificateData[];
   createdAt: string;
   updatedAt: string;
