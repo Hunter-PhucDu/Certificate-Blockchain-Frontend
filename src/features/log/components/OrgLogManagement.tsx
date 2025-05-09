@@ -12,18 +12,25 @@ import {
   message,
 } from "antd";
 import { useTranslation } from "react-i18next";
+import { useTenantLogs, Log } from "@/services/LogService";
 import { format } from "date-fns";
 import { DownloadOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 const { Search } = Input;
 
-const LogManagement: React.FC = () => {
+const OrgLogManagement: React.FC = () => {
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isExporting, setIsExporting] = useState(false);
+
+  const { data: logsData, isLoading } = useTenantLogs({
+    page: currentPage,
+    size: pageSize,
+    search: searchText,
+  });
 
   const formatPayload = (text: string) => {
     try {
@@ -43,21 +50,14 @@ const LogManagement: React.FC = () => {
 
       const csvData = [
         ["username", "action", "payload", "role", "timestamp"],
-        [
-          "John Doe",
-          "LOGIN",
-          formatPayload('{"ip": "192.168.1.1"}'),
-          "SUPER_ADMIN",
-          format(new Date(), "dd/MM/yyyy HH:mm:ss"),
-        ],
-        [
-          "Jane Smith",
-          "LOGOUT",
-          formatPayload('{"ip": "192.168.1.2"}'),
-          "ADMIN",
-          format(new Date(), "dd/MM/yyyy HH:mm:ss"),
-        ],
-      ].map((row) => row.map((cell) => `"${cell}"`).join(","));
+        ...(logsData?.data || []).map((log: Log) => [
+          log.username,
+          log.action.replace(/_/g, " ").toLowerCase(),
+          formatPayload(log.payload),
+          log.role.replace(/_/g, " "),
+          format(new Date(log.timestamp), "dd/MM/yyyy HH:mm:ss"),
+        ]),
+      ].map((row) => row.map((cell: string) => `"${cell}"`).join(","));
 
       const csvContent = [...csvData].join("\n");
 
@@ -67,7 +67,7 @@ const LogManagement: React.FC = () => {
       link.setAttribute("href", url);
       link.setAttribute(
         "download",
-        `system_logs_${format(new Date(), "yyyy-MM-dd_HH-mm-ss")}.csv`,
+        `tenant_logs_${format(new Date(), "yyyy-MM-dd_HH-mm-ss")}.csv`,
       );
       document.body.appendChild(link);
       link.click();
@@ -170,13 +170,13 @@ const LogManagement: React.FC = () => {
 
         <Table
           columns={columns}
-          dataSource={[]}
+          dataSource={logsData?.data}
           rowKey="timestamp"
-          loading={false}
+          loading={isLoading}
           pagination={{
             current: currentPage,
             pageSize: pageSize,
-            total: 2,
+            total: logsData?.metadata?.totalItem,
             onChange: (page) => setCurrentPage(page),
             showSizeChanger: false,
           }}
@@ -188,4 +188,4 @@ const LogManagement: React.FC = () => {
   );
 };
 
-export default LogManagement;
+export default OrgLogManagement;

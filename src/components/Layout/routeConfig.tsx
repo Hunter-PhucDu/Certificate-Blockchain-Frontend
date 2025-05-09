@@ -94,8 +94,6 @@ export const useMenuItems = (): MenuItem[] => {
       "/certificates",
       <FileProtectOutlined />,
     ),
-    getItem(t("common.groups"), "groups", "/groups", <AppstoreOutlined />),
-    getItem(t("common.documents"), "documents", "/documents", <FileOutlined />),
   ];
 
   if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") {

@@ -33,14 +33,17 @@ import {
   useUpdateGroup,
 } from "@/services/GroupService";
 import {
+  CertificateValueType,
   useCertificates,
   useCreateCertificate,
   useDeleteCertificate,
+  Certificate,
+  CertificateData,
 } from "@/services/CertificateService";
 import {
   certificateTemplates,
   CertificateTemplate,
-} from "@/configs/certificateTemplates";
+} from "@/features/certificate/certificateTemplates";
 import { App } from "antd";
 import CertificatePreview from "./CertificatePreview";
 import CertificateManagement from "./CertificateManagement";
@@ -54,23 +57,6 @@ interface GroupNode {
   title: React.ReactNode;
   children?: GroupNode[];
   isLeaf?: boolean;
-}
-
-interface Certificate {
-  id: string;
-  groupId: string;
-  certificateType: string;
-  certificateData: Array<{
-    key: string;
-    values: Array<{
-      label: string;
-      value: string;
-      type: string;
-      isUnique?: boolean;
-    }>;
-  }>;
-  createdAt: string;
-  updatedAt: string;
 }
 
 const CertificateExplorer: React.FC = () => {
@@ -518,16 +504,15 @@ const CertificateExplorer: React.FC = () => {
                         { required: true, message: t("common.required") },
                       ]}
                     >
-                      {field.type === "select" ? (
+                      {field.type === "Boolean" ? (
                         <Select>
-                          {field.options?.map((option) => (
-                            <Select.Option key={option} value={option}>
-                              {option}
-                            </Select.Option>
-                          ))}
+                          <Select.Option value="true">Có</Select.Option>
+                          <Select.Option value="false">Không</Select.Option>
                         </Select>
-                      ) : field.type === "date" ? (
-                        <Input type="date" />
+                      ) : field.type === "Date" ? (
+                        <Input type="Date" />
+                      ) : field.type === "Number" ? (
+                        <Input type="number" />
                       ) : (
                         <Input type={field.type} />
                       )}
