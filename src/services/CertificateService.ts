@@ -39,6 +39,18 @@ export interface UpdateCertificateBody {
   certificateData: CertificateData[];
 }
 
+export interface BulkCreateCertificateBody {
+  groupId: string;
+  certificateType: string;
+  certificatesData: CertificateData[][];
+}
+
+export interface BulkCreateCertificateResponse {
+  txId: string;
+  certificatesCount: number;
+  certificateIds: string[];
+}
+
 export interface CertificateTypeStatistics {
   type: string;
   count: number;
@@ -56,6 +68,7 @@ const CERTIFICATE_ENDPOINTS = {
   CERTIFICATE: (id: string) => `/certificates/${id}`,
   CERTIFICATE_BY_TX: (txHash: string) => `/certificates/tx/${txHash}`,
   STATISTICS: "/certificates/dashboard/statistics",
+  BULK_CREATE: "/certificates/bulk",
 };
 
 export const CertificateService = {
@@ -84,6 +97,14 @@ export const CertificateService = {
   createCertificate: (data: CreateCertificateBody) => {
     return apiService.post<ApiResponse<Certificate>>(
       CERTIFICATE_ENDPOINTS.CERTIFICATES,
+      data,
+    );
+  },
+
+  // Bulk create certificates
+  bulkCreateCertificates: (data: BulkCreateCertificateBody) => {
+    return apiService.post<ApiResponse<BulkCreateCertificateResponse>>(
+      CERTIFICATE_ENDPOINTS.BULK_CREATE,
       data,
     );
   },
@@ -141,6 +162,18 @@ export const useCreateCertificate = () => {
   return useMutation({
     mutationFn: (data: CreateCertificateBody) =>
       CertificateService.createCertificate(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["certificates"] });
+    },
+  });
+};
+
+export const useBulkCreateCertificates = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: BulkCreateCertificateBody) =>
+      CertificateService.bulkCreateCertificates(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["certificates"] });
     },

@@ -307,7 +307,7 @@ const CertificateExplorer: React.FC = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Sider width={300} style={{ padding: "8px" }}>
+      <Sider width={220} style={{ padding: "0px" }}>
         {isGroupsLoading ? (
           <div style={{ textAlign: "center", padding: "24px" }}>
             <Spin />

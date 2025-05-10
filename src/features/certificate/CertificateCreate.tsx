@@ -65,13 +65,39 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
 
   useEffect(() => {
     if (editingCertificate) {
+      const isCustom = !certificateTemplates.find(
+        (t) => t.id === editingCertificate.certificateType,
+      );
+      setIsCustomTemplate(isCustom);
+
+      if (isCustom) {
+        const customFieldsData = editingCertificate.certificateData.map(
+          (data) => ({
+            key: data.key,
+            label: data.values[0].label,
+            type: data.values[0].type,
+            isUnique: data.values[0].isUnique,
+          }),
+        );
+        setCustomFields(customFieldsData);
+        form.setFieldsValue({
+          certificateName: editingCertificate.certificateType,
+          ...editingCertificate.certificateData.reduce(
+            (acc, data) => {
+              acc[data.key] = data.values[0].value;
+              return acc;
+            },
+            {} as Record<string, any>,
+          ),
+        });
+      } else {
+        const initialValues: Record<string, any> = {};
+        editingCertificate.certificateData.forEach((data) => {
+          initialValues[data.key] = data.values[0].value;
+        });
+        form.setFieldsValue(initialValues);
+      }
       setSelectedTemplate(editingCertificate.certificateType);
-      const initialValues: Record<string, any> = {};
-      editingCertificate.certificateData.forEach((data: CertificateData) => {
-        initialValues[data.key] = data.values[0].value;
-      });
-      form.setFieldsValue(initialValues);
-      setPreviewData(initialValues);
     } else {
       form.resetFields();
       setSelectedTemplate(null);
@@ -202,7 +228,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
       }
       open={isVisible}
       onCancel={handleCancel}
-      width={1200}
+      width={1000}
       footer={null}
     >
       <div
@@ -467,6 +493,7 @@ const CertificateCreate: React.FC<CertificateCreateProps> = ({
                   }
                 : certificateTemplates.find((t) => t.id === selectedTemplate)
             }
+            certificate={editingCertificate || undefined}
             data={previewData}
           />
         </div>
