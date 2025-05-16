@@ -26,7 +26,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    redirect("/admin-login");
+    redirect("/login");
   }
 
   return (
