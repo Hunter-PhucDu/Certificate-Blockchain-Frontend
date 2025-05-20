@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Form, Input, Button, Card, Typography, Steps, Row } from "antd";
+import { Form, Input, Button, Card, Typography, Steps, Col } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import {
@@ -11,17 +11,51 @@ import {
 } from "@/services/AuthService";
 import OtpInputComponent from "@/components/Elements/OtpInput";
 import { useToast } from "@/components/Elements/Toast";
+import { BlockchainLoginBackground } from "@/components/BlockchainUI";
+import styled from "@emotion/styled";
 
 const { Title, Paragraph } = Typography;
 
 const steps = [
   {
-    title: "Get OTP",
+    title: "Lấy mã OTP",
   },
   {
-    title: "Verify OTP",
+    title: "Xác thực mã OTP",
   },
 ];
+
+const StyledCard = styled(Card)`
+  width: 100%;
+  max-width: 450px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+  }
+
+  .ant-card-body {
+    padding: 2rem;
+  }
+`;
+
+const FormCol = styled(Col)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+`;
 
 const AdminForgotPasswordPage = () => {
   const router = useRouter();
@@ -37,19 +71,19 @@ const AdminForgotPasswordPage = () => {
   const handleRequestOtp = async (values: OtpForgotPasswordRequestDto) => {
     getOtpMutation.mutate(values, {
       onSuccess: () => {
-        toast.success("OTP code has been sent to your email");
+        toast.success("Mã OTP đã được gửi đến email của bạn");
         setEmail(values.email);
         setCurrentStep(1);
       },
       onError: () => {
-        toast.error("An error occurred while sending the OTP code.");
+        toast.error("Đã xảy ra lỗi khi gửi mã OTP.");
       },
     });
   };
 
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) {
-      toast.error("Please enter full 6 OTP digits");
+      toast.error("Vui lòng nhập đủ 6 chữ số mã OTP");
       return;
     }
 
@@ -57,10 +91,10 @@ const AdminForgotPasswordPage = () => {
       { otp, email },
       {
         onSuccess: () => {
-          toast.success("OTP authentication successful");
+          toast.success("Xác thực mã OTP thành công");
         },
         onError: () => {
-          toast.error("Invalid OTP code");
+          toast.error("Mã OTP không hợp lệ");
         },
       },
     );
@@ -78,8 +112,8 @@ const AdminForgotPasswordPage = () => {
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: "Please input your email!" },
-                { type: "email", message: "Please enter a valid email!" },
+                { required: true, message: "Vui lòng nhập email của bạn!" },
+                { type: "email", message: "Vui lòng nhập email hợp lệ!" },
               ]}
             >
               <Input
@@ -97,7 +131,7 @@ const AdminForgotPasswordPage = () => {
                 block
                 loading={getOtpMutation.isPending}
               >
-                Send OTP
+                Gửi mã OTP
               </Button>
             </Form.Item>
 
@@ -107,7 +141,7 @@ const AdminForgotPasswordPage = () => {
                 block
                 onClick={() => router.push("/admin-login")}
               >
-                Back to Login
+                Quay lại đăng nhập
               </Button>
             </Form.Item>
           </Form>
@@ -122,7 +156,7 @@ const AdminForgotPasswordPage = () => {
               isDisabled={sendLinkMutation.isPending}
             />
 
-            <Form.Item>
+            <Form.Item style={{ marginTop: "20px" }}>
               <Button
                 type="primary"
                 size="large"
@@ -141,29 +175,24 @@ const AdminForgotPasswordPage = () => {
   };
 
   return (
-    <Row
-      justify="center"
-      align="middle"
-      style={{
-        minHeight: "100vh",
-        background: "url('/login-bg.jpg') no-repeat center/cover",
-      }}
-    >
-      <Card className="w-full max-w-[450px]">
-        <div className="text-center mb-6">
-          <Title level={2} className="mb-2 font-semibold">
-            Forgot Password
-          </Title>
-          <Paragraph type="secondary">
-            Recover your administrator password
-          </Paragraph>
-        </div>
+    <BlockchainLoginBackground tagline="Hệ thống xác thực chứng chỉ blockchain an toàn, minh bạch và đáng tin cậy">
+      <FormCol>
+        <StyledCard>
+          <div className="text-center mb-6">
+            <Title level={2} className="mb-2 font-semibold">
+              Quên mật khẩu
+            </Title>
+            <Paragraph type="secondary">
+              Khôi phục mật khẩu quản trị viên
+            </Paragraph>
+          </div>
 
-        <Steps current={currentStep} items={steps} className="mb-16" />
+          <Steps current={currentStep} items={steps} className="mb-8" />
 
-        <div className="mt-8">{renderStepContent()}</div>
-      </Card>
-    </Row>
+          <div className="mt-8">{renderStepContent()}</div>
+        </StyledCard>
+      </FormCol>
+    </BlockchainLoginBackground>
   );
 };
 

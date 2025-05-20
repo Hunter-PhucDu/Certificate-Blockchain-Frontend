@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <!-- Background grid pattern -->
+  <defs>
+    <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a3a6a" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+    <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="url(#smallGrid)"/>
+      <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#1a3a6a" stroke-width="1" opacity="0.2"/>
+    </pattern>
+    
+    <!-- Glowing effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Data flow animation -->
+    <linearGradient id="dataFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(114, 248, 255, 0)" />
+      <stop offset="50%" stop-color="rgba(114, 248, 255, 0.8)" />
+      <stop offset="100%" stop-color="rgba(114, 248, 255, 0)" />
+      <animate attributeName="x1" from="0%" to="100%" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="x2" from="100%" to="200%" dur="3s" repeatCount="indefinite" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background grid -->
+  <rect width="100%" height="100%" fill="url(#grid)" opacity="0.1"/>
+  
+  <!-- Blockchain structure -->
+  <g opacity="0.6">
+    <!-- Blocks (horizontal chain) -->
+    <!-- Block 1 -->
+    <rect x="100" y="250" width="80" height="120" rx="10" fill="rgba(255,255,255,0.05)" 
+          stroke="rgba(114,248,255,0.3)" stroke-width="1.5"/>
+    <text x="110" y="270" font-size="10" fill="rgba(255,255,255,0.8)">BLOCK #1</text>
+    <text x="110" y="290" font-size="7" fill="rgba(114,248,255,0.8)" font-family="monospace">0x7ab3...</text>
+    <rect x="110" y="300" width="60" height="30" rx="2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+    <text x="115" y="315" font-size="5" fill="rgba(255,255,255,0.6)" font-family="monospace">DATA</text>
+    <text x="140" y="360" font-size="8" fill="rgba(255,255,255,0.7)">GENESIS</text>
+    
+    <!-- Block 2 -->
+    <rect x="230" y="250" width="80" height="120" rx="10" fill="rgba(255,255,255,0.05)" 
+          stroke="rgba(114,248,255,0.3)" stroke-width="1.5"/>
+    <text x="240" y="270" font-size="10" fill="rgba(255,255,255,0.8)">BLOCK #2</text>
+    <text x="240" y="290" font-size="7" fill="rgba(114,248,255,0.8)" font-family="monospace">0x3f28...</text>
+    <rect x="240" y="300" width="60" height="30" rx="2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+    <text x="245" y="315" font-size="5" fill="rgba(255,255,255,0.6)" font-family="monospace">DATA</text>
+    
+    <!-- Block 3 -->
+    <rect x="360" y="250" width="80" height="120" rx="10" fill="rgba(255,255,255,0.05)" 
+          stroke="rgba(114,248,255,0.3)" stroke-width="1.5"/>
+    <text x="370" y="270" font-size="10" fill="rgba(255,255,255,0.8)">BLOCK #3</text>
+    <text x="370" y="290" font-size="7" fill="rgba(114,248,255,0.8)" font-family="monospace">0x9c2d...</text>
+    <rect x="370" y="300" width="60" height="30" rx="2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+    <text x="375" y="315" font-size="5" fill="rgba(255,255,255,0.6)" font-family="monospace">DATA</text>
+    
+    <!-- Block 4 -->
+    <rect x="490" y="250" width="80" height="120" rx="10" fill="rgba(255,255,255,0.05)" 
+          stroke="rgba(114,248,255,0.3)" stroke-width="1.5"/>
+    <text x="500" y="270" font-size="10" fill="rgba(255,255,255,0.8)">BLOCK #4</text>
+    <text x="500" y="290" font-size="7" fill="rgba(114,248,255,0.8)" font-family="monospace">0x5f71...</text>
+    <rect x="500" y="300" width="60" height="30" rx="2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+    <text x="505" y="315" font-size="5" fill="rgba(255,255,255,0.6)" font-family="monospace">DATA</text>
+    
+    <!-- Block 5 -->
+    <rect x="620" y="250" width="80" height="120" rx="10" fill="rgba(255,255,255,0.05)" 
+          stroke="rgba(114,248,255,0.3)" stroke-width="1.5"/>
+    <text x="630" y="270" font-size="10" fill="rgba(255,255,255,0.8)">BLOCK #5</text>
+    <text x="630" y="290" font-size="7" fill="rgba(114,248,255,0.8)" font-family="monospace">0x2e4b...</text>
+    <rect x="630" y="300" width="60" height="30" rx="2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+    <text x="635" y="315" font-size="5" fill="rgba(255,255,255,0.6)" font-family="monospace">DATA</text>
+    <text x="645" y="360" font-size="8" fill="rgba(255,255,255,0.7)">LATEST</text>
+    
+    <!-- Connections between blocks -->
+    <line x1="180" y1="310" x2="230" y2="310" stroke="url(#dataFlow)" stroke-width="2"/>
+    <line x1="310" y1="310" x2="360" y2="310" stroke="url(#dataFlow)" stroke-width="2"/>
+    <line x1="440" y1="310" x2="490" y2="310" stroke="url(#dataFlow)" stroke-width="2"/>
+    <line x1="570" y1="310" x2="620" y2="310" stroke="url(#dataFlow)" stroke-width="2"/>
+    
+    <!-- Network nodes -->
+    <circle cx="140" cy="450" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="280" cy="400" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="400" cy="480" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="520" cy="420" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="660" cy="460" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="200" cy="500" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="340" cy="540" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="460" cy="520" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="580" cy="570" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    <circle cx="700" cy="510" r="3" fill="rgba(114,248,255,0.7)" filter="url(#glow)"/>
+    
+    <!-- Network lines -->
+    <line x1="140" y1="450" x2="280" y2="400" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="280" y1="400" x2="400" y2="480" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="400" y1="480" x2="520" y2="420" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="520" y1="420" x2="660" y2="460" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="140" y1="450" x2="200" y2="500" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="280" y1="400" x2="340" y2="540" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="400" y1="480" x2="460" y2="520" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="520" y1="420" x2="580" y2="570" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="660" y1="460" x2="700" y2="510" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="200" y1="500" x2="340" y2="540" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="340" y1="540" x2="460" y2="520" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="460" y1="520" x2="580" y2="570" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    <line x1="580" y1="570" x2="700" y2="510" stroke="rgba(114,248,255,0.2)" stroke-width="0.5"/>
+    
+    <!-- Connection to blocks -->
+    <line x1="140" y1="450" x2="140" y2="370" stroke="rgba(114,248,255,0.3)" stroke-width="0.5"/>
+    <line x1="280" y1="400" x2="270" y2="370" stroke="rgba(114,248,255,0.3)" stroke-width="0.5"/>
+    <line x1="400" y1="480" x2="400" y2="370" stroke="rgba(114,248,255,0.3)" stroke-width="0.5"/>
+    <line x1="520" y1="420" x2="530" y2="370" stroke="rgba(114,248,255,0.3)" stroke-width="0.5"/>
+    <line x1="660" y1="460" x2="660" y2="370" stroke="rgba(114,248,255,0.3)" stroke-width="0.5"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <g opacity="0.1">
+    <!-- Binary data streams -->
+    <text x="50" y="50" font-family="monospace" font-size="10" fill="rgba(114,248,255,0.8)">
+      10110101 01001010 11010101 01101010
+    </text>
+    <text x="550" y="70" font-family="monospace" font-size="10" fill="rgba(114,248,255,0.8)">
+      01011010 11001010 01010101 10101000
+    </text>
+    <text x="150" y="600" font-family="monospace" font-size="10" fill="rgba(114,248,255,0.8)">
+      10110101 01001010 11010101 01101010
+    </text>
+    <text x="480" y="650" font-family="monospace" font-size="10" fill="rgba(114,248,255,0.8)">
+      01011010 11001010 01010101 10101000
+    </text>
+    
+    <!-- Hash values -->
+    <text x="120" y="100" font-family="monospace" font-size="8" fill="rgba(114,248,255,0.6)">
+      0x3a7bd3e2f4c9b1a8e0d5f6c3b9a2e1d0
+    </text>
+    <text x="420" y="180" font-family="monospace" font-size="8" fill="rgba(114,248,255,0.6)">
+      0x9e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b
+    </text>
+    <text x="220" y="700" font-family="monospace" font-size="8" fill="rgba(114,248,255,0.6)">
+      0x1f2e3d4c5b6a7f8e9d0c1b2a3f4e5d6c
+    </text>
+    <text x="520" y="750" font-family="monospace" font-size="8" fill="rgba(114,248,255,0.6)">
+      0x7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d
+    </text>
+    
+    <!-- Key/signature patterns -->
+    <path d="M50,150 C70,140 90,160 110,150 C130,140 150,160 170,150 C190,140 210,160 230,150" 
+          stroke="rgba(114,248,255,0.4)" fill="none" stroke-width="1"/>
+    <path d="M550,120 C570,110 590,130 610,120 C630,110 650,130 670,120 C690,110 710,130 730,120" 
+          stroke="rgba(114,248,255,0.4)" fill="none" stroke-width="1"/>
+    <path d="M150,550 C170,540 190,560 210,550 C230,540 250,560 270,550 C290,540 310,560 330,550" 
+          stroke="rgba(114,248,255,0.4)" fill="none" stroke-width="1"/>
+    <path d="M450,580 C470,570 490,590 510,580 C530,570 550,590 570,580 C590,570 610,590 630,580" 
+          stroke="rgba(114,248,255,0.4)" fill="none" stroke-width="1"/>
+  </g>
+</svg>

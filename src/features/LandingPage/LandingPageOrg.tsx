@@ -24,7 +24,6 @@ import {
   BlockOutlined,
   ScanOutlined,
   QrcodeOutlined,
-  ArrowRightOutlined,
 } from "@ant-design/icons";
 import { useSearchCertificateByValue } from "@/services/VerifyService";
 import styled from "@emotion/styled";
@@ -32,7 +31,6 @@ import Link from "next/link";
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text } = Typography;
-const { Panel } = Collapse;
 
 const HeroSection = styled.div`
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -675,11 +673,9 @@ export default function LandingPageOrg() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate background color based on scroll position
   const getBackgroundColor = () => {
-    const heroHeight = 600; // Approximate height of hero section
-    const searchHeight = 400; // Approximate height of search section
-    const featureHeight = 500; // Approximate height of feature section
+    const heroHeight = 600;
+    const searchHeight = 400;
 
     if (scrollPosition < heroHeight) {
       return "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)";
@@ -690,7 +686,6 @@ export default function LandingPageOrg() {
     }
   };
 
-  // Search certificate
   const {
     data: certificateData,
     isLoading,
@@ -709,7 +704,6 @@ export default function LandingPageOrg() {
     }
   };
 
-  // Định nghĩa items cho Collapse
   const detailsCollapseItems =
     certificateData?.data && certificateData.data.length > 0
       ? [
