@@ -21,6 +21,7 @@ import { languages } from "@/lib/i18n/settings";
 import { useTranslation } from "react-i18next";
 import { useLanguageStore } from "@/stores/languageStore";
 import { useAuthStore } from "@/stores/authStore";
+import { redirect } from "next/navigation";
 
 const { Header: AntHeader } = Layout;
 const { useToken } = theme;
@@ -51,12 +52,9 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
 
   const userMenuItems: MenuProps["items"] = [
     {
-      key: "profile",
-      label: t("common.profile"),
-    },
-    {
       key: "settings",
       label: t("common.settings"),
+      onClick: () => redirect("/settings"),
     },
     {
       type: "divider",

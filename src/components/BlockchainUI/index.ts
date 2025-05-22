@@ -1,1 +1,1 @@
-export { default as BlockchainLoginBackground } from "./BlockchainLoginBackground";
+export { default as BlockchainBackground } from "./BlockchainBackground";

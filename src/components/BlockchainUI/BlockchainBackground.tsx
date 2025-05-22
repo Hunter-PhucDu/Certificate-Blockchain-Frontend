@@ -5,7 +5,6 @@ import { BlockOutlined } from "@ant-design/icons";
 
 const { Paragraph } = Typography;
 
-// Styled components
 const LoginContainer = styled(Row)`
   min-height: 100vh;
   background: linear-gradient(135deg, #0a1f3f 0%, #152a4d 50%, #1e3871 100%);
@@ -654,12 +653,12 @@ const BlockchainIllustration = styled.div`
   }
 `;
 
-interface BlockchainLoginBackgroundProps {
+interface BlockchainBackgroundProps {
   children: ReactNode;
   tagline: string;
 }
 
-const BlockchainLoginBackground: React.FC<BlockchainLoginBackgroundProps> = ({
+const BlockchainBackground: React.FC<BlockchainBackgroundProps> = ({
   children,
   tagline,
 }) => {
@@ -908,4 +907,4 @@ const BlockchainLoginBackground: React.FC<BlockchainLoginBackgroundProps> = ({
   );
 };
 
-export default BlockchainLoginBackground;
+export default BlockchainBackground;

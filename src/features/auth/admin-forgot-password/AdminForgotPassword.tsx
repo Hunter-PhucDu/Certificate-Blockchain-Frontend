@@ -11,7 +11,7 @@ import {
 } from "@/services/AuthService";
 import OtpInputComponent from "@/components/Elements/OtpInput";
 import { useToast } from "@/components/Elements/Toast";
-import { BlockchainLoginBackground } from "@/components/BlockchainUI";
+import { BlockchainBackground } from "@/components/BlockchainUI";
 import styled from "@emotion/styled";
 
 const { Title, Paragraph } = Typography;
@@ -175,7 +175,7 @@ const AdminForgotPasswordPage = () => {
   };
 
   return (
-    <BlockchainLoginBackground tagline="Hệ thống xác thực chứng chỉ blockchain an toàn, minh bạch và đáng tin cậy">
+    <BlockchainBackground tagline="Hệ thống xác thực chứng chỉ blockchain an toàn, minh bạch và đáng tin cậy">
       <FormCol>
         <StyledCard>
           <div className="text-center mb-6">
@@ -192,7 +192,7 @@ const AdminForgotPasswordPage = () => {
           <div className="mt-8">{renderStepContent()}</div>
         </StyledCard>
       </FormCol>
-    </BlockchainLoginBackground>
+    </BlockchainBackground>
   );
 };
 

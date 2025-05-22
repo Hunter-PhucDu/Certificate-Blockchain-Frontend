@@ -2,11 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Input,
   Button,
   Layout,
   Typography,
-  Card,
   Spin,
   Row,
   Col,
@@ -24,626 +22,40 @@ import {
   BlockOutlined,
   ScanOutlined,
   QrcodeOutlined,
+  GithubOutlined,
+  TwitterOutlined,
+  LinkedinOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  EnvironmentOutlined,
 } from "@ant-design/icons";
 import { useSearchCertificateByValue } from "@/services/VerifyService";
-import styled from "@emotion/styled";
 import Link from "next/link";
+import {
+  BlockchainAnimation,
+  BlockchainBadge,
+  BrandTagline,
+  CertificateCard,
+  CertificateDetail,
+  CertificateHeader,
+  ConnectionLines,
+  FeatureCard,
+  FeatureSection,
+  HeroContent,
+  HeroSection,
+  NetworkNodes,
+  OrgLogo,
+  SearchButton,
+  SearchContainer,
+  SearchInput,
+  SearchSection,
+  SocialLink,
+  StyledFooter,
+  TechGrid,
+} from "./BlockchainUI";
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
-
-const HeroSection = styled.div`
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  padding: 120px 0 80px;
-  text-align: center;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  transition: background 0.5s ease;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("/grid.svg") center center;
-    opacity: 0.1;
-    pointer-events: none;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-      circle at center,
-      rgba(59, 130, 246, 0.1) 0%,
-      transparent 70%
-    );
-    animation: pulse 8s ease-in-out infinite alternate;
-  }
-
-  @keyframes pulse {
-    0% {
-      opacity: 0.5;
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0.8;
-      transform: scale(1.1);
-    }
-  }
-`;
-
-const BlockchainAnimation = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  overflow: hidden;
-
-  .block {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: monospace;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 10px;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-    animation: floatBlock 12s infinite linear;
-    opacity: 0.7;
-  }
-
-  .block:nth-child(1) {
-    top: 15%;
-    left: 10%;
-    animation-delay: 0s;
-  }
-
-  .block:nth-child(2) {
-    top: 35%;
-    left: 20%;
-    animation-delay: 2s;
-  }
-
-  .block:nth-child(3) {
-    top: 65%;
-    left: 15%;
-    animation-delay: 4s;
-  }
-
-  .block:nth-child(4) {
-    top: 25%;
-    right: 15%;
-    animation-delay: 1s;
-  }
-
-  .block:nth-child(5) {
-    top: 50%;
-    right: 10%;
-    animation-delay: 3s;
-  }
-
-  .block:nth-child(6) {
-    bottom: 20%;
-    right: 20%;
-    animation-delay: 5s;
-  }
-
-  .chain {
-    position: absolute;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      rgba(59, 130, 246, 0.3),
-      rgba(59, 130, 246, 0.8),
-      rgba(59, 130, 246, 0.3)
-    );
-    animation: pulseChain 4s infinite;
-  }
-
-  .chain:nth-child(7) {
-    width: 120px;
-    top: 18%;
-    left: 15%;
-    transform: rotate(30deg);
-  }
-
-  .chain:nth-child(8) {
-    width: 150px;
-    top: 40%;
-    left: 25%;
-    transform: rotate(-20deg);
-  }
-
-  .chain:nth-child(9) {
-    width: 100px;
-    bottom: 30%;
-    left: 20%;
-    transform: rotate(15deg);
-  }
-
-  .chain:nth-child(10) {
-    width: 130px;
-    top: 30%;
-    right: 20%;
-    transform: rotate(-25deg);
-  }
-
-  .chain:nth-child(11) {
-    width: 120px;
-    top: 55%;
-    right: 15%;
-    transform: rotate(20deg);
-  }
-
-  .chain:nth-child(12) {
-    width: 140px;
-    bottom: 25%;
-    right: 25%;
-    transform: rotate(-15deg);
-  }
-
-  @keyframes floatBlock {
-    0% {
-      transform: translateY(0) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-15px) rotate(5deg);
-    }
-    100% {
-      transform: translateY(0) rotate(0deg);
-    }
-  }
-
-  @keyframes pulseChain {
-    0% {
-      opacity: 0.3;
-    }
-    50% {
-      opacity: 0.8;
-    }
-    100% {
-      opacity: 0.3;
-    }
-  }
-`;
-
-const TechGrid = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image:
-    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.3;
-  z-index: 0;
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  animation: gridAnimation 20s linear infinite;
-
-  @keyframes gridAnimation {
-    0% {
-      transform: rotateX(10deg) translateZ(0);
-    }
-    100% {
-      transform: rotateX(10deg) translateZ(100px);
-    }
-  }
-`;
-
-const ConnectionLines = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 0;
-
-  .line {
-    position: absolute;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(59, 130, 246, 0.5),
-      transparent
-    );
-    animation: moveLine 8s linear infinite;
-    opacity: 0;
-  }
-
-  .line:nth-child(1) {
-    width: 30%;
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-  }
-
-  .line:nth-child(2) {
-    width: 20%;
-    top: 40%;
-    right: 20%;
-    animation-delay: 2s;
-  }
-
-  .line:nth-child(3) {
-    width: 25%;
-    bottom: 30%;
-    left: 30%;
-    animation-delay: 4s;
-  }
-
-  .line:nth-child(4) {
-    width: 15%;
-    bottom: 20%;
-    right: 10%;
-    animation-delay: 6s;
-  }
-
-  @keyframes moveLine {
-    0% {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-    20% {
-      opacity: 1;
-    }
-    80% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-`;
-
-const OrgLogo = styled.div`
-  height: 100px;
-  width: 100px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const SearchSection = styled.div`
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  padding: 48px;
-  margin-top: -60px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  position: relative;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(10px);
-
-  &:hover {
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const CertificateCard = styled(Card)`
-  margin-top: 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: none;
-  overflow: hidden;
-  position: relative;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-
-  .ant-card-body {
-    padding: 0;
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      45deg,
-      transparent,
-      rgba(59, 130, 246, 0.03),
-      transparent
-    );
-    transform: translateX(-100%);
-    animation: cardShine 3s infinite;
-  }
-
-  @keyframes cardShine {
-    0% {
-      transform: translateX(-100%) rotate(25deg);
-    }
-    100% {
-      transform: translateX(100%) rotate(25deg);
-    }
-  }
-`;
-
-const CertificateHeader = styled.div`
-  padding: 32px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: white;
-  border-radius: 12px 12px 0 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      45deg,
-      rgba(59, 130, 246, 0.1) 0%,
-      transparent 100%
-    );
-    animation: shine 3s infinite;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image:
-      radial-gradient(rgba(59, 130, 246, 0.2) 2px, transparent 2px),
-      radial-gradient(rgba(59, 130, 246, 0.15) 2px, transparent 2px);
-    background-size: 30px 30px;
-    background-position:
-      0 0,
-      15px 15px;
-    opacity: 0.3;
-  }
-`;
-
-const CertificateDetail = styled.div`
-  padding: 24px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
-`;
-
-const StyledFooter = styled(Footer)`
-  background-color: #0f172a;
-  color: white;
-  padding: 48px 24px;
-  text-align: center;
-`;
-
-const BlockchainBadge = styled.div`
-  display: inline-flex;
-  align-items: center;
-  background: rgba(37, 99, 235, 0.1);
-  color: #3b82f6;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 16px;
-  backdrop-filter: blur(8px);
-
-  .anticon {
-    margin-right: 8px;
-  }
-`;
-
-const SearchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 28px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-
-  &:hover,
-  &:focus-within {
-    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.2);
-    border-color: rgba(59, 130, 246, 0.5);
-    transform: translateY(-2px);
-  }
-`;
-
-const SearchInput = styled(Input)`
-  flex: 1;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  height: 56px;
-  font-size: 16px;
-  padding: 0 24px;
-
-  .ant-input {
-    background: transparent !important;
-    color: #333;
-    height: 56px;
-    border-radius: 0;
-    padding: 0 24px;
-    font-size: 16px;
-    border: none !important;
-    box-shadow: none !important;
-
-    &:hover,
-    &:focus {
-      border: none !important;
-      box-shadow: none !important;
-    }
-  }
-
-  .ant-input-prefix {
-    margin-right: 12px;
-    color: #3b82f6;
-  }
-`;
-
-const SearchButton = styled(Button)`
-  height: 56px;
-  border-radius: 0 28px 28px 0;
-  font-size: 16px;
-  font-weight: 500;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border: none;
-  padding: 0 32px;
-  box-shadow: none;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-
-  &:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-      to bottom right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    transform: rotate(45deg);
-    transition: all 0.5s ease;
-    opacity: 0;
-  }
-
-  &:hover::after {
-    animation: shine 1.5s ease;
-  }
-
-  @keyframes shine {
-    0% {
-      left: -50%;
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      left: 150%;
-      opacity: 0;
-    }
-  }
-`;
-
-const FeatureSection = styled.div`
-  padding: 100px 50px;
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-  position: relative;
-  overflow: hidden;
-  transition: background 0.5s ease;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 400px;
-    background: linear-gradient(180deg, #f7fafc 0%, #ffffff 100%);
-    z-index: 0;
-  }
-`;
-
-const FeatureCard = styled(Card)`
-  border-radius: 16px;
-  border: none;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-
-  &:hover {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-
-    .icon-wrapper {
-      transform: translateY(-5px);
-    }
-
-    &::before {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(59, 130, 246, 0.05) 0%,
-      transparent 100%
-    );
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-  }
-
-  .ant-card-head {
-    border-bottom: none;
-    padding: 24px;
-  }
-
-  .ant-card-body {
-    padding: 0 24px 24px;
-  }
-
-  .icon-wrapper {
-    transition: transform 0.3s ease;
-  }
-`;
 
 export default function LandingPageOrg() {
   const [searchValue, setSearchValue] = useState("");
@@ -651,7 +63,6 @@ export default function LandingPageOrg() {
   const [organizationName, setOrganizationName] = useState("");
   const [scrollPosition, setScrollPosition] = useState(0);
 
-  // Extract organization name from subdomain
   useEffect(() => {
     const hostname = window.location.hostname;
     const subdomain = hostname.split(".")[0];
@@ -662,7 +73,6 @@ export default function LandingPageOrg() {
     }
   }, []);
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       const position = window.pageYOffset;
@@ -801,7 +211,7 @@ export default function LandingPageOrg() {
       <Header
         style={{
           background: "#1a365d",
-          padding: "0 50px",
+          padding: "0 20px",
           height: "80px",
           position: "fixed",
           width: "100%",
@@ -822,24 +232,27 @@ export default function LandingPageOrg() {
         >
           <div style={{ display: "flex", alignItems: "center" }}>
             <SafetyCertificateOutlined
-              style={{ fontSize: 28, color: "#60a5fa", marginRight: 12 }}
+              style={{ fontSize: 24, color: "#60a5fa", marginRight: 8 }}
             />
-            <Text strong style={{ color: "white", fontSize: 20 }}>
-              {organizationName} | Authenticate.io
+            <Text
+              strong
+              style={{ color: "white", fontSize: 16, whiteSpace: "nowrap" }}
+            >
+              {organizationName} | Authenticate.io.vn
             </Text>
           </div>
           <div>
             <Link href="/login">
               <Button
                 type="primary"
-                size="large"
+                size="middle"
                 style={{
                   background:
                     "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
                   border: "none",
-                  height: "44px",
-                  padding: "0 24px",
-                  borderRadius: "22px",
+                  height: "38px",
+                  padding: "0 20px",
+                  borderRadius: "19px",
                   boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
                 }}
               >
@@ -851,60 +264,244 @@ export default function LandingPageOrg() {
       </Header>
 
       <Content style={{ paddingTop: "80px" }}>
-        <HeroSection style={{ background: getBackgroundColor() }}>
+        <HeroSection
+          style={{
+            background:
+              "linear-gradient(135deg, #0a1f3f 0%, #152a4d 50%, #1e3871 100%)",
+          }}
+        >
           <TechGrid />
           <BlockchainAnimation>
+            <NetworkNodes />
+
+            {/* Blocks */}
             <div className="block">0x8F3E...</div>
             <div className="block">0xA72B...</div>
             <div className="block">0x6D9C...</div>
             <div className="block">0x3F1A...</div>
             <div className="block">0xB45D...</div>
             <div className="block">0x2E7F...</div>
+
+            {/* Chain connections */}
             <div className="chain"></div>
             <div className="chain"></div>
             <div className="chain"></div>
             <div className="chain"></div>
             <div className="chain"></div>
             <div className="chain"></div>
+
+            {/* Static network nodes */}
+            <div
+              className="network-node"
+              style={{ top: "15%", left: "25%", opacity: "0.3" }}
+            ></div>
+            <div
+              className="network-node"
+              style={{ top: "30%", left: "45%", opacity: "0.25" }}
+            ></div>
+            <div
+              className="network-node"
+              style={{ top: "60%", left: "35%", opacity: "0.3" }}
+            ></div>
+            <div
+              className="network-node"
+              style={{ top: "25%", left: "75%", opacity: "0.2" }}
+            ></div>
+            <div
+              className="network-node"
+              style={{ top: "50%", left: "85%", opacity: "0.25" }}
+            ></div>
+            <div
+              className="network-node"
+              style={{ top: "70%", left: "65%", opacity: "0.3" }}
+            ></div>
+
+            {/* Network lines */}
+            <div
+              className="network-line"
+              style={{
+                top: "15%",
+                left: "25%",
+                width: "22%",
+                transform: "rotate(20deg)",
+                opacity: "0.1",
+              }}
+            ></div>
+            <div
+              className="network-line"
+              style={{
+                top: "30%",
+                left: "45%",
+                width: "18%",
+                transform: "rotate(-15deg)",
+                opacity: "0.12",
+              }}
+            ></div>
+            <div
+              className="network-line"
+              style={{
+                top: "60%",
+                left: "35%",
+                width: "33%",
+                transform: "rotate(15deg)",
+                opacity: "0.08",
+              }}
+            ></div>
+            <div
+              className="network-line"
+              style={{
+                top: "25%",
+                left: "75%",
+                width: "12%",
+                transform: "rotate(35deg)",
+                opacity: "0.15",
+              }}
+            ></div>
+            <div
+              className="network-line"
+              style={{
+                top: "50%",
+                left: "65%",
+                width: "20%",
+                transform: "rotate(-10deg)",
+                opacity: "0.1",
+              }}
+            ></div>
+
+            {/* Particles */}
+            <div
+              className="particle"
+              style={{
+                top: "20%",
+                left: "30%",
+                animationDuration: "18s",
+                opacity: "0.4",
+              }}
+            ></div>
+            <div
+              className="particle"
+              style={{
+                top: "40%",
+                left: "60%",
+                animationDuration: "15s",
+                animationDelay: "2s",
+                opacity: "0.35",
+              }}
+            ></div>
+            <div
+              className="particle"
+              style={{
+                top: "65%",
+                left: "25%",
+                animationDuration: "20s",
+                animationDelay: "1s",
+                opacity: "0.4",
+              }}
+            ></div>
+            <div
+              className="particle"
+              style={{
+                top: "15%",
+                left: "70%",
+                animationDuration: "22s",
+                animationDelay: "3s",
+                opacity: "0.3",
+              }}
+            ></div>
+            <div
+              className="particle particle-data"
+              style={{
+                top: "55%",
+                left: "75%",
+                animationDuration: "16s",
+                animationDelay: "4s",
+                opacity: "0.5",
+              }}
+            ></div>
+            <div
+              className="particle particle-data"
+              style={{
+                top: "35%",
+                left: "40%",
+                animationDuration: "18s",
+                animationDelay: "2.5s",
+                opacity: "0.45",
+              }}
+            ></div>
+
+            {/* Digital rain effect */}
+            <div className="digital-rain">
+              <div
+                className="rain-column"
+                style={{
+                  left: "10%",
+                  animationDuration: "18s",
+                  height: "12%",
+                  opacity: "0.2",
+                }}
+              ></div>
+              <div
+                className="rain-column"
+                style={{
+                  left: "25%",
+                  animationDuration: "15s",
+                  height: "10%",
+                  animationDelay: "3s",
+                  opacity: "0.15",
+                }}
+              ></div>
+              <div
+                className="rain-column"
+                style={{
+                  left: "45%",
+                  animationDuration: "20s",
+                  height: "8%",
+                  animationDelay: "1.5s",
+                  opacity: "0.2",
+                }}
+              ></div>
+              <div
+                className="rain-column"
+                style={{
+                  left: "65%",
+                  animationDuration: "17s",
+                  height: "11%",
+                  animationDelay: "4s",
+                  opacity: "0.18",
+                }}
+              ></div>
+              <div
+                className="rain-column"
+                style={{
+                  left: "85%",
+                  animationDuration: "19s",
+                  height: "13%",
+                  animationDelay: "2.5s",
+                  opacity: "0.15",
+                }}
+              ></div>
+            </div>
           </BlockchainAnimation>
           <ConnectionLines>
             <div className="line"></div>
             <div className="line"></div>
             <div className="line"></div>
             <div className="line"></div>
+            <div className="line"></div>
+            <div className="line"></div>
           </ConnectionLines>
 
-          <OrgLogo>
-            <Text style={{ fontSize: 40, fontWeight: "bold", color: "white" }}>
-              {organizationName?.charAt(0)}
-            </Text>
-          </OrgLogo>
+          <HeroContent>
+            <OrgLogo>
+              <Text className="logo-text">{organizationName?.charAt(0)}</Text>
+            </OrgLogo>
 
-          <Title
-            style={{
-              color: "white",
-              fontSize: 48,
-              marginBottom: 24,
-              position: "relative",
-              zIndex: 2,
-            }}
-          >
-            {organizationName}
-          </Title>
+            <Title level={1}>{organizationName}</Title>
 
-          <Paragraph
-            style={{
-              color: "rgba(255, 255, 255, 0.8)",
-              fontSize: 18,
-              maxWidth: 800,
-              margin: "0 auto",
-              lineHeight: 1.6,
-              position: "relative",
-              zIndex: 2,
-            }}
-          >
-            Hệ thống xác thực chứng chỉ trên nền tảng blockchain
-          </Paragraph>
+            <BrandTagline>
+              Hệ thống xác thực chứng chỉ trên nền tảng blockchain
+            </BrandTagline>
+          </HeroContent>
         </HeroSection>
 
         <SearchSection>
@@ -1152,23 +749,105 @@ export default function LandingPageOrg() {
       </Content>
 
       <StyledFooter>
-        <Row justify="center" align="middle">
-          <Col>
-            <SafetyCertificateOutlined
-              style={{ fontSize: 28, marginRight: 12, color: "#3b82f6" }}
-            />
-            <Text strong style={{ color: "white", fontSize: 18 }}>
-              {organizationName} | Authenticate.io
-            </Text>
-            <Divider
-              type="vertical"
-              style={{ background: "rgba(255,255,255,0.2)", margin: "0 24px" }}
-            />
-            <Text style={{ color: "rgba(255,255,255,0.7)" }}>
-              © {new Date().getFullYear()} All rights reserved
-            </Text>
-          </Col>
-        </Row>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <Row gutter={[32, 32]}>
+            <Col xs={24} md={8}>
+              <Title level={4} style={{ color: "white" }}>
+                Authenticate.io.vn
+              </Title>
+              <Paragraph style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                Hệ thống xác thực chứng chỉ trên nền tảng blockchain, đảm bảo
+                tính minh bạch và bảo mật cho các tổ chức và cá nhân.
+              </Paragraph>
+              <div style={{ marginTop: 20 }}>
+                <SocialLink
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <GithubOutlined />
+                </SocialLink>
+                <SocialLink
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <TwitterOutlined />
+                </SocialLink>
+                <SocialLink
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <LinkedinOutlined />
+                </SocialLink>
+              </div>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Title level={4} style={{ color: "white" }}>
+                Liên Kết
+              </Title>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+              >
+                <Link href="#" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                  Về Chúng Tôi
+                </Link>
+                <Link href="#" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                  Công Nghệ
+                </Link>
+                <Link href="#" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                  Đối Tác
+                </Link>
+                <Link href="#" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                  Hỗ Trợ
+                </Link>
+                <Link
+                  href="/admin-login"
+                  style={{ color: "rgba(255, 255, 255, 0.65)" }}
+                >
+                  Đăng Nhập
+                </Link>
+              </div>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Title level={4} style={{ color: "white" }}>
+                Liên Hệ
+              </Title>
+              <div
+                style={{ color: "rgba(255, 255, 255, 0.65)", marginBottom: 16 }}
+              >
+                <MailOutlined style={{ marginRight: 10 }} />{" "}
+                phucpv.k62cntta@utb.edu.vn
+              </div>
+              <div
+                style={{ color: "rgba(255, 255, 255, 0.65)", marginBottom: 16 }}
+              >
+                <PhoneOutlined style={{ marginRight: 10 }} /> +84 123 456 789
+              </div>
+              <div style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                <EnvironmentOutlined style={{ marginRight: 10 }} /> Tòa nhà ABC,
+                Đường XYZ, Hà Nội, Việt Nam
+              </div>
+            </Col>
+          </Row>
+
+          <Divider
+            style={{
+              borderColor: "rgba(255, 255, 255, 0.1)",
+              margin: "32px 0",
+            }}
+          />
+
+          <div
+            style={{ textAlign: "center", color: "rgba(255, 255, 255, 0.5)" }}
+          >
+            © {new Date().getFullYear()} Authenticate.io.vn. All rights
+            reserved.
+          </div>
+        </div>
       </StyledFooter>
     </Layout>
   );

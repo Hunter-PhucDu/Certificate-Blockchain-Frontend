@@ -1,32 +1,33 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import Layout from "@/components/Layout/Layout";
 import { useAuthStore } from "@/stores/authStore";
 import { redirect } from "next/navigation";
 import Loader from "@/components/Elements/Loader";
-import { usePathname } from "next/navigation";
 import { App } from "antd";
+import { isAllowedHostname } from "@/config/constants/hosts";
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, initializeFromStorage, setLoading } =
     useAuthStore();
-  const pathname = usePathname();
-
-  const [key, setKey] = useState(0);
 
   useEffect(() => {
+    // Kiểm tra hostname
+    if (typeof window !== "undefined" && !isAllowedHostname()) {
+      redirect("/");
+    }
+
     setLoading(true);
     initializeFromStorage();
-    setKey((prev) => prev + 1);
-  }, [pathname, initializeFromStorage, setLoading]);
+  }, [initializeFromStorage, setLoading]);
 
   if (isLoading) {
-    return <Loader key={`loader-${key}`} />;
+    return <Loader />;
   }
 
   if (!isAuthenticated) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

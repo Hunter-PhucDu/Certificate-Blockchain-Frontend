@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Layout, Menu } from "antd";
+import { Divider, Layout, Menu } from "antd";
 import { useMenuItems } from "./routeConfig";
 import { useTheme } from "@/providers/Provider";
 import { Box } from "../Elements";
@@ -41,21 +41,21 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         themeColor="text.primary"
         style={{
           height: 48,
-          margin: 16,
+          margin: 3,
           borderRadius: 6,
           display: "flex",
           alignItems: "center",
-          justifyContent: collapsed ? "center" : "flex-start",
+          justifyContent: "center",
           fontWeight: "bold",
           overflow: "hidden",
-          padding: collapsed ? "0 8px" : "0 16px",
         }}
       >
         <UserInfo collapsed={collapsed} />
       </Box>
+      <Divider style={{ marginTop: 13 }} />
       <Menu
         mode="inline"
-        defaultSelectedKeys={["1"]}
+        selectedKeys={["1"]}
         defaultOpenKeys={collapsed ? [] : ["sub1", "sub2"]}
         items={menuItems}
         style={{

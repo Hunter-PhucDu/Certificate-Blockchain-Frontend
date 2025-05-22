@@ -7,7 +7,7 @@ import { useChangePassword } from "@/services/AdminService";
 import { useToast } from "@/components/Elements/Toast";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { BlockchainLoginBackground } from "@/components/BlockchainUI";
+import { BlockchainBackground } from "@/components/BlockchainUI";
 import styled from "@emotion/styled";
 
 const { Title } = Typography;
@@ -85,7 +85,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <BlockchainLoginBackground tagline="Hệ thống xác thực chứng chỉ blockchain an toàn và minh bạch">
+    <BlockchainBackground tagline="Hệ thống xác thực chứng chỉ blockchain an toàn và minh bạch">
       <FormCol>
         <StyledCard>
           <Title level={2} className="text-center mb-6">
@@ -173,7 +173,7 @@ const ChangePassword = () => {
           </Form>
         </StyledCard>
       </FormCol>
-    </BlockchainLoginBackground>
+    </BlockchainBackground>
   );
 };
 

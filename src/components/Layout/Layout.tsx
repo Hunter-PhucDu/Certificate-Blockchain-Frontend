@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Layout as AntLayout, Breadcrumb } from "antd";
+import { Layout as AntLayout } from "antd";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { useTheme } from "@/providers/Provider";
@@ -27,8 +27,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const themeColors = isDarkMode ? darkThemeColors : lightThemeColors;
   const currentShadow = isDarkMode ? shadows.dark.small : shadows.light.small;
 
-  const breadcrumbItems = [{ title: "Home" }, { title: "Dashboard" }];
-
   const logout = useAuthStore((state) => state.clearAuth);
 
   useEffect(() => {
@@ -53,13 +51,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Content style={{ margin: "88px 16px 0", overflow: "initial" }}>
-          <Breadcrumb
-            items={breadcrumbItems}
-            style={{
-              margin: "16px 0",
-              color: themeColors.text.secondary,
-            }}
-          />
           <div
             style={{
               padding: tokens.spacing.lg,

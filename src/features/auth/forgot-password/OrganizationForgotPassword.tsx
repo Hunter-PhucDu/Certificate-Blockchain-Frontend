@@ -6,7 +6,6 @@ import "@ant-design/v5-patch-for-react-19";
 import { Form, Input, Button, Card, Typography, Steps, Col } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import {
   OtpForgotPasswordRequestDto,
   useOrganizationGetOtpForgotPassword,
@@ -14,7 +13,7 @@ import {
 } from "@/services/AuthService";
 import OtpInputComponent from "@/components/Elements/OtpInput";
 import { useToast } from "@/components/Elements/Toast";
-import { BlockchainLoginBackground } from "@/components/BlockchainUI";
+import { BlockchainBackground } from "@/components/BlockchainUI";
 import styled from "@emotion/styled";
 
 const { Title, Paragraph } = Typography;
@@ -63,7 +62,6 @@ const FormCol = styled(Col)`
 `;
 
 const OrganizationForgotPasswordPage = () => {
-  const { t } = useTranslation();
   const router = useRouter();
   const [emailForm] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
@@ -181,7 +179,7 @@ const OrganizationForgotPasswordPage = () => {
   };
 
   return (
-    <BlockchainLoginBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
+    <BlockchainBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
       <FormCol>
         <StyledCard>
           <div className="text-center mb-6">
@@ -198,7 +196,7 @@ const OrganizationForgotPasswordPage = () => {
           <div className="mt-8">{renderStepContent()}</div>
         </StyledCard>
       </FormCol>
-    </BlockchainLoginBackground>
+    </BlockchainBackground>
   );
 };
 

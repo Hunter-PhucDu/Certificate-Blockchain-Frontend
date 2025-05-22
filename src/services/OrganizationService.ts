@@ -51,11 +51,19 @@ export interface OrganizationMonthlyStatisticsResponse {
   data: MonthlyData[];
 }
 
+export interface ChangePasswordBody {
+  password: string;
+  newPassword: string;
+}
+
 const ORGANIZATION_ENDPOINTS = {
   ORGANIZATIONS: "/organizations",
-  ORGANIZATION: (id: string) => `/organizations/${id}`,
+  ORGANIZATION: (id: string) => `/organizations/profile/${id}`,
   STATISTICS: "/organizations/dashboard/statistics",
   MONTHLY_STATISTICS: "/organizations/dashboard/monthly-statistics",
+  ORGANIZATION_PROFILE: "/organizations/organization/profile",
+  UPDATE_ORGANIZATION_PROFILE: "/organizations/update-profile",
+  CHANGE_PASSWORD: "/organizations/change-password",
 };
 
 export const OrganizationService = {
@@ -107,6 +115,29 @@ export const OrganizationService = {
   getMonthlyStatistics: () => {
     return apiService.get<ApiResponse<OrganizationMonthlyStatistics>>(
       ORGANIZATION_ENDPOINTS.MONTHLY_STATISTICS,
+    );
+  },
+
+  // Get organization profile
+  getOrganizationProfile: () => {
+    return apiService.get<ApiResponse<Organization>>(
+      ORGANIZATION_ENDPOINTS.ORGANIZATION_PROFILE,
+    );
+  },
+
+  // Update organization profile
+  updateOrganizationProfile: (data: FormData) => {
+    return apiService.put<ApiResponse<Organization>>(
+      ORGANIZATION_ENDPOINTS.UPDATE_ORGANIZATION_PROFILE,
+      data,
+    );
+  },
+
+  // Change password
+  changePassword: (data: ChangePasswordBody) => {
+    return apiService.put<ApiResponse<void>>(
+      ORGANIZATION_ENDPOINTS.CHANGE_PASSWORD,
+      data,
     );
   },
 };
@@ -184,5 +215,34 @@ export const useOrganizationMonthlyStatistics = () => {
       const response = await OrganizationService.getMonthlyStatistics();
       return response.data;
     },
+  });
+};
+
+// Profile hooks
+export const useOrganizationProfile = (options?: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ["organization-profile"],
+    queryFn: () => OrganizationService.getOrganizationProfile(),
+    enabled: options?.enabled !== undefined ? options.enabled : true,
+  });
+};
+
+export const useUpdateOrganizationProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: FormData) =>
+      OrganizationService.updateOrganizationProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["organization-profile"] });
+    },
+  });
+};
+
+// Change password hook
+export const useChangeOrganizationPassword = () => {
+  return useMutation({
+    mutationFn: (data: ChangePasswordBody) =>
+      OrganizationService.changePassword(data),
   });
 };

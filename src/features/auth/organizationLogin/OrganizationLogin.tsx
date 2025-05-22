@@ -10,27 +10,19 @@ import {
   Checkbox,
   Row,
   Col,
-  Divider,
   Spin,
 } from "antd";
-import {
-  MailOutlined,
-  LockOutlined,
-  BankOutlined,
-  BlockOutlined,
-  SwapOutlined,
-} from "@ant-design/icons";
+import { MailOutlined, LockOutlined, BankOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/Elements/Toast";
 import { LoginRequestDto, useOrganizationLogin } from "@/services/AuthService";
 import { useAuthStore } from "@/stores/authStore";
 import Link from "next/link";
 import styled from "@emotion/styled";
-import { BlockchainLoginBackground } from "@/components/BlockchainUI";
+import { BlockchainBackground } from "@/components/BlockchainUI";
 
 const { Title, Paragraph, Text } = Typography;
 
-// Styled components
 const StyledCard = styled(Card)`
   width: 100%;
   max-width: 450px;
@@ -122,29 +114,6 @@ const ForgotPasswordLink = styled(Link)`
   }
 `;
 
-const SwitchLoginLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-  color: #2d4fa3;
-  font-weight: 500;
-  transition: all 0.3s ease;
-
-  .icon {
-    margin-right: 8px;
-    transition: transform 0.3s ease;
-  }
-
-  &:hover {
-    color: #0f2852;
-
-    .icon {
-      transform: rotate(180deg);
-    }
-  }
-`;
-
 const LoginFormCol = styled(Col)`
   display: flex;
   justify-content: center;
@@ -203,19 +172,19 @@ export default function OrganizationLoginPage() {
 
   if (isLoading) {
     return (
-      <BlockchainLoginBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
+      <BlockchainBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
         <div style={{ textAlign: "center", zIndex: 10 }}>
           <Spin size="large" />
           <Title level={4} style={{ color: "white", marginTop: 20 }}>
             Đang tải...
           </Title>
         </div>
-      </BlockchainLoginBackground>
+      </BlockchainBackground>
     );
   }
 
   return (
-    <BlockchainLoginBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
+    <BlockchainBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
       <LoginFormCol xs={24} md={12}>
         <StyledCard>
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
@@ -306,6 +275,6 @@ export default function OrganizationLoginPage() {
           </Form>
         </StyledCard>
       </LoginFormCol>
-    </BlockchainLoginBackground>
+    </BlockchainBackground>
   );
 }
