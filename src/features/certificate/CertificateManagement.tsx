@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Space,
@@ -37,7 +37,9 @@ import {
   useDeleteCertificate,
   useCertificates,
   Certificate,
+  CertificateListParams,
 } from "@/services/CertificateService";
+import { PaginatedResponse } from "@/services/api/types";
 import Papa from "papaparse";
 import type { FormInstance } from "antd";
 import type { MenuProps } from "antd";
@@ -66,8 +68,19 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
     useState<Certificate | null>(null);
   const [searchText, setSearchText] = useState("");
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
 
-  const { refetch: refetchCertificates } = useCertificates();
+  const certificateParams: CertificateListParams = {
+    page: pagination.current,
+    size: pagination.pageSize,
+    search: searchText,
+  };
+
+  const { data: paginatedCertificates, refetch: refetchCertificates } =
+    useCertificates(certificateParams);
   const deleteCertificate = useDeleteCertificate();
   const handleDeleteCertificate = async (certificateId: string) => {
     try {
@@ -78,6 +91,10 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
       messageApi.error(t("common.certificates.error"));
     }
   };
+
+  const totalItems =
+    (paginatedCertificates as PaginatedResponse<Certificate>)?.metadata
+      ?.totalItem || 0;
 
   const showModal = (certificate?: Certificate) => {
     if (certificate) {
@@ -99,7 +116,6 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
       return;
     }
 
-    // Group certificates by type
     const certsByType = certificates.reduce(
       (acc, cert) => {
         if (!acc[cert.certificateType]) {
@@ -111,7 +127,6 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
       {} as Record<string, Certificate[]>,
     );
 
-    // Ask which type to export if there are multiple types
     if (Object.keys(certsByType).length > 1) {
       let selectedType = "";
 
@@ -222,6 +237,11 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
     },
   ];
 
+  useEffect(() => {
+    refetchCertificates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.current, searchText, refetchCertificates]);
+
   return (
     <div>
       <div
@@ -237,7 +257,13 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
           <Input
             placeholder={t("common.certificates.search")}
             prefix={<SearchOutlined />}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setPagination({
+                ...pagination,
+                current: 1,
+              });
+            }}
             style={{ width: 200 }}
           />
           <Button
@@ -256,14 +282,19 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
       <Table
         columns={[
           {
-            title: t("common.certificates.type"),
-            dataIndex: "certificateType",
-            key: "certificateType",
-            render: (type: string) => {
-              const template = certificateTemplates.find(
-                (template: CertificateTemplate) => template.id === type,
-              );
-              return template ? template.name : type;
+            title: t("common.certificates.firstName") || "Họ và tên",
+            key: "firstName",
+            render: (_, record: Certificate) => {
+              // Lấy giá trị đầu tiên trong certificateData (nếu có)
+              if (
+                record.certificateData &&
+                record.certificateData.length > 0 &&
+                record.certificateData[0].values &&
+                record.certificateData[0].values.length > 0
+              ) {
+                return record.certificateData[0].values[0].value;
+              }
+              return "-";
             },
           },
           {
@@ -315,10 +346,23 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
             ),
           },
         ]}
-        dataSource={certificates.filter((cert) =>
-          cert.certificateType.toLowerCase().includes(searchText.toLowerCase()),
-        )}
+        dataSource={
+          (paginatedCertificates as PaginatedResponse<Certificate>)?.data || []
+        }
         rowKey="id"
+        pagination={{
+          current: pagination.current,
+          pageSize: 10,
+          showSizeChanger: false,
+          showTotal: (total) => t("common.pagination.showTotal", { total }),
+          onChange: (page) => {
+            setPagination({
+              current: page,
+              pageSize: 10,
+            });
+          },
+          total: totalItems,
+        }}
       />
 
       <CertificateCreate

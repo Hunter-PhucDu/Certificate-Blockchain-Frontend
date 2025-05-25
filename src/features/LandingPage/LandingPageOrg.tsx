@@ -51,7 +51,6 @@ import {
   SearchSection,
   SocialLink,
   StyledFooter,
-  TechGrid,
 } from "./BlockchainUI";
 
 const { Header, Content } = Layout;
@@ -114,97 +113,105 @@ export default function LandingPageOrg() {
     }
   };
 
-  const detailsCollapseItems =
-    certificateData?.data && certificateData.data.length > 0
-      ? [
-          {
-            key: "1",
-            label: "Thông Tin Chi Tiết Chứng Chỉ",
-            children: (
-              <div
-                className="detail-list"
-                style={{
-                  padding: "16px 24px",
-                  background: "#fafafa",
-                  borderRadius: 8,
-                }}
-              >
-                {certificateData.data[0].certificateData.map((sec) =>
-                  sec.values.map((item) => (
-                    <Row
-                      key={item.label}
-                      gutter={[8, 8]}
-                      style={{
-                        padding: "8px 0",
-                        borderBottom: "1px solid #e8e8e8",
-                        borderRadius: 4,
-                      }}
-                    >
-                      <Col flex="none">
-                        <Text
-                          type="secondary"
-                          style={{ minWidth: 140, fontWeight: 500 }}
-                        >
-                          {item.label}:
-                        </Text>
-                      </Col>
-                      <Col flex="auto">
-                        <Text>{item.value}</Text>
-                      </Col>
-                    </Row>
-                  )),
-                )}
-              </div>
-            ),
-            extra: (
-              <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 20 }} />
-            ),
-          },
-          {
-            key: "2",
-            label: "Thông Tin Blockchain",
-            children: (
-              <Table
-                dataSource={[
-                  {
-                    key: "1",
-                    property: "Transaction Hash",
-                    value: certificateData.data[0].txHash,
-                  },
-                  {
-                    key: "2",
-                    property: "Block ID",
-                    value: certificateData.data[0].blockId,
-                  },
-                  {
-                    key: "3",
-                    property: "Thời gian xác thực",
-                    value: certificateData.data[0].createdAt
-                      ? new Date(
-                          certificateData.data[0].createdAt,
-                        ).toLocaleString("vi-VN")
-                      : "",
-                  },
-                ]}
-                columns={[
-                  {
-                    title: "Thuộc tính",
-                    dataIndex: "property",
-                    key: "property",
-                  },
-                  {
-                    title: "Giá trị",
-                    dataIndex: "value",
-                    key: "value",
-                  },
-                ]}
-                pagination={false}
-                size="small"
-              />
-            ),
-          },
-        ]
-      : [];
+  const getLatestCertificate = () => {
+    if (certificateData?.data && certificateData.data.length > 0) {
+      return certificateData.data[certificateData.data.length - 1];
+    }
+    return null;
+  };
+
+  const latestCertificate = getLatestCertificate();
+
+  const detailsCollapseItems = latestCertificate
+    ? [
+        {
+          key: "1",
+          label: "Thông Tin Chi Tiết Chứng Chỉ",
+          children: (
+            <div
+              className="detail-list"
+              style={{
+                padding: "16px 24px",
+                background: "#fafafa",
+                borderRadius: 8,
+              }}
+            >
+              {latestCertificate.certificateData.map((sec) =>
+                sec.values.map((item) => (
+                  <Row
+                    key={item.label}
+                    gutter={[8, 8]}
+                    style={{
+                      padding: "8px 0",
+                      borderBottom: "1px solid #e8e8e8",
+                      borderRadius: 4,
+                    }}
+                  >
+                    <Col flex="none">
+                      <Text
+                        type="secondary"
+                        style={{ minWidth: 140, fontWeight: 500 }}
+                      >
+                        {item.label}:
+                      </Text>
+                    </Col>
+                    <Col flex="auto">
+                      <Text>{item.value}</Text>
+                    </Col>
+                  </Row>
+                )),
+              )}
+            </div>
+          ),
+          extra: (
+            <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 20 }} />
+          ),
+        },
+        {
+          key: "2",
+          label: "Thông Tin Blockchain",
+          children: (
+            <Table
+              dataSource={[
+                {
+                  key: "1",
+                  property: "Transaction Hash",
+                  value: latestCertificate.txHash,
+                },
+                {
+                  key: "2",
+                  property: "Block ID",
+                  value: latestCertificate.blockId,
+                },
+                {
+                  key: "3",
+                  property: "Thời gian xác thực",
+                  value: latestCertificate.createdAt
+                    ? new Date(latestCertificate.createdAt).toLocaleString(
+                        "vi-VN",
+                      )
+                    : "",
+                },
+              ]}
+              columns={[
+                {
+                  title: "Thuộc tính",
+                  dataIndex: "property",
+                  key: "property",
+                },
+                {
+                  title: "Giá trị",
+                  dataIndex: "value",
+                  key: "value",
+                },
+              ]}
+              pagination={false}
+              size="small"
+            />
+          ),
+        },
+      ]
+    : [];
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -270,7 +277,6 @@ export default function LandingPageOrg() {
               "linear-gradient(135deg, #0a1f3f 0%, #152a4d 50%, #1e3871 100%)",
           }}
         >
-          <TechGrid />
           <BlockchainAnimation>
             <NetworkNodes />
 
@@ -547,8 +553,8 @@ export default function LandingPageOrg() {
 
           {isError && !isLoading && (
             <Alert
-              message="Không thể tìm kiếm"
-              description="Đã xảy ra lỗi trong quá trình tìm kiếm. Vui lòng thử lại sau."
+              message="Không tìm thây kết quả"
+              description="Có thể do nhập sai thông tin hoặc đã xảy ra lỗi trong quá trình tìm kiếm. Vui lòng thử lại sau!"
               type="error"
               showIcon
             />
@@ -585,28 +591,28 @@ export default function LandingPageOrg() {
                   </BlockchainBadge>
                 </CertificateHeader>
 
-                {certificateData.data.map((certificate, index) => (
-                  <div key={index}>
+                {latestCertificate && (
+                  <div>
                     <CertificateDetail>
                       <Row gutter={[24, 16]}>
                         <Col xs={24} md={12}>
                           <Text type="secondary">Loại Chứng Chỉ</Text>
                           <div style={{ fontSize: 16, fontWeight: 500 }}>
-                            {certificate.certificateType}
+                            {latestCertificate.certificateType}
                           </div>
                         </Col>
                         <Col xs={24} md={12}>
                           <Text type="secondary">Ngày Cấp</Text>
                           <div style={{ fontSize: 16, fontWeight: 500 }}>
-                            {new Date(certificate.createdAt).toLocaleDateString(
-                              "vi-VN",
-                            )}
+                            {new Date(
+                              latestCertificate.createdAt,
+                            ).toLocaleDateString("vi-VN")}
                           </div>
                         </Col>
                         <Col xs={24} md={12}>
                           <Text type="secondary">Mã Chứng Chỉ</Text>
                           <div style={{ fontSize: 16, fontWeight: 500 }}>
-                            {certificate.id}
+                            {latestCertificate.id}
                           </div>
                         </Col>
                         <Col xs={24} md={12}>
@@ -618,7 +624,7 @@ export default function LandingPageOrg() {
                               wordBreak: "break-all",
                             }}
                           >
-                            {certificate.txHash}
+                            {latestCertificate.txHash}
                           </div>
                         </Col>
                       </Row>
@@ -631,7 +637,7 @@ export default function LandingPageOrg() {
                       />
                     </div>
                   </div>
-                ))}
+                )}
               </CertificateCard>
             )}
 

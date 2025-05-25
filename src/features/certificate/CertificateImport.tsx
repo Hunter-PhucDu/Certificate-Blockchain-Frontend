@@ -252,25 +252,30 @@ const CertificateImport: React.FC<CertificateImportProps> = ({
               <Title level={4}>{t("common.certificates.reviewData")}</Title>
               <Paragraph>
                 {t("common.certificates.totalRecords")}: {csvData.length}
+                {csvData.length > 0 && (
+                  <span style={{ marginLeft: "8px", color: "#1890ff" }}>
+                    ({t("common.certificates.allRecordsDisplayed")})
+                  </span>
+                )}
               </Paragraph>
 
               <Table
-                dataSource={csvData.slice(0, 5)}
+                dataSource={csvData}
                 columns={headers.map((header) => ({
                   title: header,
                   dataIndex: header,
                   key: header,
                 }))}
-                pagination={false}
+                pagination={{
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  showTotal: (total) =>
+                    t("common.pagination.showTotal", { total }),
+                }}
                 size="small"
                 rowKey={(record, index) => index?.toString() || "0"}
-                footer={() =>
-                  csvData.length > 5
-                    ? t("common.certificates.moreRecords", {
-                        count: csvData.length - 5,
-                      })
-                    : null
-                }
+                scroll={{ y: 300 }}
               />
             </div>
           </>
@@ -295,7 +300,8 @@ const CertificateImport: React.FC<CertificateImportProps> = ({
       title={t("common.certificates.importCertificates")}
       open={isVisible}
       onCancel={handleCancel}
-      width={800}
+      width={900}
+      style={{ top: 20 }}
       footer={null}
     >
       {renderImportSteps()}

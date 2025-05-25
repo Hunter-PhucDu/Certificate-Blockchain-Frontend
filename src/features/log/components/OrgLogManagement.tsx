@@ -53,7 +53,7 @@ const OrgLogManagement: React.FC = () => {
         ...(logsData?.data || []).map((log: Log) => [
           log.username,
           log.action.replace(/_/g, " ").toLowerCase(),
-          formatPayload(log.payload),
+          JSON.stringify(log.payload).replace(/"/g, '""'),
           log.role.replace(/_/g, " "),
           format(new Date(log.timestamp), "dd/MM/yyyy HH:mm:ss"),
         ]),
@@ -61,7 +61,10 @@ const OrgLogManagement: React.FC = () => {
 
       const csvContent = [...csvData].join("\n");
 
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const BOM = new Uint8Array([0xef, 0xbb, 0xbf]);
+      const blob = new Blob([BOM, csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
@@ -104,8 +107,25 @@ const OrgLogManagement: React.FC = () => {
       title: t("logs.payload"),
       dataIndex: "payload",
       key: "payload",
-      render: formatPayload,
-      ellipsis: true,
+      render: (text: string) => {
+        const formattedText = formatPayload(text);
+        return (
+          <Typography.Paragraph
+            ellipsis={{
+              rows: 2,
+              tooltip: {
+                title: formattedText,
+                placement: "topLeft",
+                overlayStyle: { maxWidth: "800px", minWidth: "300px" },
+                overlayInnerStyle: { padding: "10px", fontSize: "14px" },
+              },
+            }}
+            style={{ marginBottom: 0 }}
+          >
+            {formattedText}
+          </Typography.Paragraph>
+        );
+      },
     },
     {
       title: t("logs.role"),

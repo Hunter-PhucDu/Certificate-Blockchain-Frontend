@@ -49,7 +49,6 @@ import {
   ProcessSection,
   SocialLink,
   StyledFooter,
-  TechGrid,
 } from "./BlockchainUI";
 
 const { Header, Content } = Layout;
@@ -499,7 +498,6 @@ export default function LandingPage() {
               "linear-gradient(135deg, #0a1f3f 0%, #152a4d 50%, #1e3871 100%)",
           }}
         >
-          <TechGrid />
           <BlockchainAnimation>
             <NetworkNodes />
             <div className="block">0x8F3E...</div>

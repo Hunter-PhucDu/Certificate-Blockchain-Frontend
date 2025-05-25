@@ -463,32 +463,6 @@ export const NetworkNodes = () => {
   );
 };
 
-export const TechGrid = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image:
-    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
-  opacity: 0.2;
-  z-index: 0;
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  animation: gridAnimation 25s linear infinite;
-
-  @keyframes gridAnimation {
-    0% {
-      transform: rotateX(8deg) translateZ(0);
-    }
-    100% {
-      transform: rotateX(8deg) translateZ(80px);
-    }
-  }
-`;
-
 export const ConnectionLines = styled.div`
   position: absolute;
   width: 100%;

@@ -6,17 +6,16 @@ import { useAuthStore } from "@/stores/authStore";
 import { redirect } from "next/navigation";
 import Loader from "@/components/Elements/Loader";
 import { App } from "antd";
-import { isAllowedHostname } from "@/config/constants/hosts";
+// import { isAllowedHostname } from "@/config/constants/hosts";
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, initializeFromStorage, setLoading } =
     useAuthStore();
 
   useEffect(() => {
-    // Kiểm tra hostname
-    if (typeof window !== "undefined" && !isAllowedHostname()) {
-      redirect("/");
-    }
+    // if (typeof window !== "undefined" && !isAllowedHostname()) {
+    //   redirect("/");
+    // }
 
     setLoading(true);
     initializeFromStorage();

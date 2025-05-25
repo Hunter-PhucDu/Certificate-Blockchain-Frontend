@@ -2,7 +2,7 @@
 
 import { apiService } from "@/lib/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiResponse } from "./api/types";
+import { ApiResponse, PaginatedResponse } from "./api/types";
 
 export type CertificateValueType = "String" | "Number" | "Date" | "Boolean";
 
@@ -63,6 +63,12 @@ export interface CertificateStatistics {
   revoked: number;
 }
 
+export interface CertificateListParams {
+  page: number;
+  size: number;
+  search?: string;
+}
+
 const CERTIFICATE_ENDPOINTS = {
   CERTIFICATES: "/certificates",
   CERTIFICATE: (id: string) => `/certificates/${id}`,
@@ -72,10 +78,22 @@ const CERTIFICATE_ENDPOINTS = {
 };
 
 export const CertificateService = {
-  // Get all certificates
-  getCertificates: () => {
+  // Get all certificates without pagination
+  getAllCertificates: () => {
     return apiService.get<ApiResponse<Certificate[]>>(
       CERTIFICATE_ENDPOINTS.CERTIFICATES,
+    );
+  },
+
+  // Get certificates with pagination
+  getCertificates: (params: CertificateListParams) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", params.page.toString());
+    queryParams.append("size", params.size.toString());
+    if (params.search) queryParams.append("search", params.search);
+
+    return apiService.get<PaginatedResponse<Certificate>>(
+      `${CERTIFICATE_ENDPOINTS.CERTIFICATES}?${queryParams.toString()}`,
     );
   },
 
@@ -133,10 +151,20 @@ export const CertificateService = {
 };
 
 // React Query hooks
-export const useCertificates = () => {
+export const useCertificates = (params?: CertificateListParams) => {
   return useQuery({
-    queryKey: ["certificates"],
-    queryFn: () => CertificateService.getCertificates(),
+    queryKey: ["certificates", params],
+    queryFn: () =>
+      params
+        ? CertificateService.getCertificates(params)
+        : CertificateService.getAllCertificates(),
+  });
+};
+
+export const useAllCertificates = () => {
+  return useQuery({
+    queryKey: ["certificates", "all"],
+    queryFn: () => CertificateService.getAllCertificates(),
   });
 };
 
