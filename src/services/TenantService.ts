@@ -13,6 +13,11 @@ export interface Tenant {
   updatedAt: string;
 }
 
+export interface TenantSubdomain {
+  organizationName: string;
+  subdomain: string;
+}
+
 export interface CreateTenantBody {
   organizationName: string;
   tenantName: string;
@@ -41,6 +46,7 @@ const TENANT_ENDPOINTS = {
   TENANTS: "/tenants",
   TENANT: (id: string) => `/tenants/${id}`,
   SEARCH_TENANTS: "/tenants/search",
+  SEARCH_SUBDOMAINS: "/tenants/subdomain",
   UNUSED_TENANTS: "/tenants/unused",
   STATISTICS: "/tenants/dashboard/statistics",
 };
@@ -65,6 +71,18 @@ export const TenantService = {
 
     return apiService.get<PaginatedResponse<Tenant>>(
       `${TENANT_ENDPOINTS.SEARCH_TENANTS}?${queryParams.toString()}`,
+    );
+  },
+
+  // Search subdomains with pagination
+  searchSubdomains: (params: TenantListParams) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", params.page.toString());
+    queryParams.append("size", params.size.toString());
+    if (params.search) queryParams.append("search", params.search);
+
+    return apiService.get<PaginatedResponse<TenantSubdomain>>(
+      `${TENANT_ENDPOINTS.SEARCH_SUBDOMAINS}?${queryParams.toString()}`,
     );
   },
 
@@ -121,6 +139,13 @@ export const useSearchTenants = (params: TenantListParams) => {
   return useQuery({
     queryKey: ["tenants", "search", params],
     queryFn: () => TenantService.searchTenants(params),
+  });
+};
+
+export const useSearchSubdomains = (params: TenantListParams) => {
+  return useQuery({
+    queryKey: ["tenants", "subdomains", params],
+    queryFn: () => TenantService.searchSubdomains(params),
   });
 };
 

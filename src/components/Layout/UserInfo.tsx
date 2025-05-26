@@ -1,4 +1,3 @@
-import { useAuthStore } from "@/stores/authStore";
 import { Avatar, Space } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { baseColors } from "@/config/constants/theme";
@@ -8,10 +7,16 @@ interface UserInfoProps {
 }
 
 const UserInfo = ({ collapsed }: UserInfoProps) => {
-  const user = useAuthStore((state) => state.user);
-
   return (
-    <Space align="center" size={collapsed ? 0 : 8}>
+    <Space
+      align="center"
+      size={collapsed ? 0 : 8}
+      style={{
+        width: "100%",
+        justifyContent: "center",
+        display: "flex",
+      }}
+    >
       <Avatar
         style={{
           backgroundColor: baseColors.primary.main,
@@ -20,19 +25,6 @@ const UserInfo = ({ collapsed }: UserInfoProps) => {
         icon={<UserOutlined />}
         size={collapsed ? "small" : "default"}
       />
-
-      {!collapsed && user && (
-        <div
-          className="text-sm"
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          <strong>{user.name}</strong>
-        </div>
-      )}
     </Space>
   );
 };

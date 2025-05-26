@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Layout,
   Tree,
@@ -33,7 +33,7 @@ import {
   useUpdateGroup,
 } from "@/services/GroupService";
 import {
-  useCertificates,
+  useAllCertificates,
   useCreateCertificate,
   Certificate,
 } from "@/services/CertificateService";
@@ -72,14 +72,37 @@ const CertificateExplorer: React.FC = () => {
   const [editingGroup, setEditingGroup] = useState<any>(null);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [searchText] = useState("");
+  const [currentParentId, setCurrentParentId] = useState<string | null>(null);
+  const [rootGroups, setRootGroups] = useState<any[]>([]);
+
+  // Thêm state mới
+  const [isDeleteGroupModalVisible, setIsDeleteGroupModalVisible] =
+    useState(false);
+  const [groupToDelete, setGroupToDelete] = useState<any>(null);
+  const [confirmGroupName, setConfirmGroupName] = useState("");
 
   const { data: groupsData, isLoading: isGroupsLoading } = useGroups();
   const { data: certificatesData, refetch: refetchCertificates } =
-    useCertificates();
+    useAllCertificates();
   const createGroup = useCreateGroup();
   const updateGroup = useUpdateGroup();
   const deleteGroup = useDeleteGroup();
   const createCertificate = useCreateCertificate();
+
+  // Cập nhật rootGroups khi groupsData thay đổi
+  useEffect(() => {
+    if (groupsData?.data) {
+      const roots = groupsData.data.filter((group) => !group.parentId);
+      setRootGroups(roots);
+    }
+  }, [groupsData]);
+
+  // Hiển thị root groups khi không có group nào được chọn
+  useEffect(() => {
+    if (!selectedGroup && rootGroups.length > 0) {
+      // Không tự động chọn nhóm nào cả
+    }
+  }, [selectedGroup, rootGroups]);
 
   const buildGroupTree = (groups: any[]): GroupNode[] => {
     const groupMap = new Map();
@@ -118,11 +141,31 @@ const CertificateExplorer: React.FC = () => {
     return groupsData?.data.some((group: any) => group.parentId === groupId);
   };
 
+  const checkDuplicateGroupName = (
+    groupName: string,
+    parentId: string | null,
+    excludeGroupId?: string,
+  ) => {
+    if (!groupsData?.data) return false;
+
+    return groupsData.data.some(
+      (group) =>
+        group.groupName.toLowerCase() === groupName.toLowerCase() &&
+        group.parentId === parentId &&
+        group.id !== excludeGroupId,
+    );
+  };
+
   const handleCreateGroup = async (values: any) => {
     try {
+      if (checkDuplicateGroupName(values.groupName, currentParentId)) {
+        messageApi.error(t("common.duplicateGroupName"));
+        return;
+      }
+
       await createGroup.mutateAsync({
         groupName: values.groupName,
-        parentId: selectedGroup || undefined,
+        parentId: currentParentId || undefined,
       });
       messageApi.success(t("common.success"));
       setIsCreateGroupModalVisible(false);
@@ -135,6 +178,17 @@ const CertificateExplorer: React.FC = () => {
   const handleEditGroup = async (values: any) => {
     if (!editingGroup) return;
     try {
+      if (
+        checkDuplicateGroupName(
+          values.groupName,
+          editingGroup.parentId,
+          editingGroup.id,
+        )
+      ) {
+        messageApi.error(t("common.duplicateGroupName"));
+        return;
+      }
+
       await updateGroup.mutateAsync({
         id: editingGroup.id,
         data: {
@@ -184,10 +238,33 @@ const CertificateExplorer: React.FC = () => {
     }
   };
 
-  const handleDeleteGroup = async (groupId: string) => {
+  const showCreateSubGroup = (parentId: string) => {
+    setCurrentParentId(parentId);
+    setIsCreateGroupModalVisible(true);
+    groupForm.resetFields();
+  };
+
+  const showCreateRootGroup = () => {
+    setCurrentParentId(null);
+    setIsCreateGroupModalVisible(true);
+    groupForm.resetFields();
+  };
+
+  const showDeleteConfirm = (group: any) => {
+    setGroupToDelete(group);
+    setIsDeleteGroupModalVisible(true);
+    setConfirmGroupName("");
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!groupToDelete || confirmGroupName !== groupToDelete.groupName) return;
+
     try {
-      await deleteGroup.mutateAsync(groupId);
+      await deleteGroup.mutateAsync(groupToDelete.id);
       messageApi.success(t("common.success"));
+      setIsDeleteGroupModalVisible(false);
+      setGroupToDelete(null);
+      setConfirmGroupName("");
     } catch {
       messageApi.error(t("common.error"));
     }
@@ -222,8 +299,7 @@ const CertificateExplorer: React.FC = () => {
         label: t("common.certificates.addSubGroup"),
         icon: <PlusOutlined />,
         onClick: () => {
-          setSelectedGroup(node.key);
-          setIsCreateGroupModalVisible(true);
+          showCreateSubGroup(group.id);
         },
       });
     }
@@ -239,13 +315,13 @@ const CertificateExplorer: React.FC = () => {
       },
     });
 
-    if (!hasChildGroups(node.key) && !hasCertificates(node.key)) {
+    if (!hasChildGroups(node.key)) {
       items.push({
         key: "delete",
         label: t("common.delete"),
         icon: <DeleteOutlined />,
         danger: true,
-        onClick: () => handleDeleteGroup(node.key),
+        onClick: () => showDeleteConfirm(group),
       });
     }
 
@@ -321,30 +397,75 @@ const CertificateExplorer: React.FC = () => {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => setIsCreateGroupModalVisible(true)}
+              onClick={showCreateRootGroup}
               style={{ marginTop: "16px" }}
             >
               {t("common.createFirstGroup")}
             </Button>
           </div>
         ) : (
-          <Tree
-            treeData={renderTreeNodes(buildGroupTree(groupsData.data))}
-            onSelect={handleGroupSelect}
-            defaultExpandAll
-          />
+          <>
+            <div
+              style={{
+                padding: "10px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showCreateRootGroup}
+              >
+                {t("common.createRootGroup")}
+              </Button>
+            </div>
+            <Divider style={{ margin: "0 0 10px 0" }} />
+            <Tree
+              treeData={renderTreeNodes(buildGroupTree(groupsData.data))}
+              onSelect={handleGroupSelect}
+              defaultExpandAll
+            />
+          </>
         )}
       </Sider>
       <Divider type="vertical" style={{ height: "100vh", margin: 0 }} />
       <Content style={{ padding: "16px" }}>
-        {!selectedGroup && groupsData?.data && groupsData.data.length > 0 && (
-          <div style={{ textAlign: "center", padding: "24px" }}>
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={t("common.selectGroup")}
-            />
+        {!selectedGroup && rootGroups.length > 0 && (
+          <div>
+            <div
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Title level={4}>{t("common.rootGroups")}</Title>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              {rootGroups.map((group) => (
+                <Card
+                  key={group.id}
+                  hoverable
+                  onClick={() => setSelectedGroup(group.id)}
+                >
+                  <Space>
+                    <FolderOutlined />
+                    <span>{group.groupName}</span>
+                  </Space>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
+
         {selectedGroup && (
           <>
             {hasChildGroups(selectedGroup) ? (
@@ -384,9 +505,16 @@ const CertificateExplorer: React.FC = () => {
       </Content>
 
       <Modal
-        title={t("common.createGroup")}
+        title={
+          currentParentId
+            ? t("common.createSubGroup")
+            : t("common.createRootGroup")
+        }
         open={isCreateGroupModalVisible}
-        onCancel={() => setIsCreateGroupModalVisible(false)}
+        onCancel={() => {
+          setIsCreateGroupModalVisible(false);
+          setCurrentParentId(null);
+        }}
         footer={null}
       >
         <Form form={groupForm} onFinish={handleCreateGroup}>
@@ -547,6 +675,187 @@ const CertificateExplorer: React.FC = () => {
           )}
           data={previewData}
         />
+      </Modal>
+
+      <Modal
+        title={
+          <span
+            style={{
+              fontSize: "16px",
+              fontWeight: 600,
+              color: "#24292f",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <DeleteOutlined style={{ color: "#cf222e", fontSize: "18px" }} />
+            {t("common.deleteGroup")}:{" "}
+            <span style={{ color: "#cf222e" }}>{groupToDelete?.groupName}</span>
+          </span>
+        }
+        open={isDeleteGroupModalVisible}
+        onCancel={() => {
+          setIsDeleteGroupModalVisible(false);
+          setGroupToDelete(null);
+          setConfirmGroupName("");
+        }}
+        width={520}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setIsDeleteGroupModalVisible(false);
+              setGroupToDelete(null);
+              setConfirmGroupName("");
+            }}
+            style={{
+              fontWeight: 500,
+              border: "1px solid rgba(31, 35, 40, 0.15)",
+              boxShadow: "0 1px 0 rgba(31, 35, 40, 0.04)",
+            }}
+          >
+            {t("common.cancel")}
+          </Button>,
+          <Button
+            key="delete"
+            type="primary"
+            danger
+            onClick={handleDeleteGroup}
+            disabled={confirmGroupName !== (groupToDelete?.groupName || "")}
+            style={{
+              backgroundColor:
+                confirmGroupName === (groupToDelete?.groupName || "")
+                  ? "#cf222e"
+                  : "#EB5757",
+              opacity:
+                confirmGroupName !== (groupToDelete?.groupName || "") ? 0.5 : 1,
+              fontWeight: 500,
+              boxShadow:
+                confirmGroupName === (groupToDelete?.groupName || "")
+                  ? "0 1px 0 rgba(31, 35, 40, 0.1)"
+                  : "none",
+            }}
+          >
+            {t("common.delete")} {t("common.thisGroup")}
+          </Button>,
+        ]}
+        styles={{
+          header: { borderBottom: "1px solid #d0d7de", padding: "16px 24px" },
+          footer: { borderTop: "1px solid #d0d7de", padding: "16px 24px" },
+          body: {
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+          },
+        }}
+      >
+        <div>
+          <Typography.Paragraph
+            style={{
+              fontSize: "14px",
+              marginBottom: "16px",
+              color: "#24292f",
+              lineHeight: "1.5",
+            }}
+          >
+            {t("common.deleteGroupConfirmation")}{" "}
+            <strong>{groupToDelete?.groupName}</strong>{" "}
+            {t("common.deleteGroupAction")}
+          </Typography.Paragraph>
+
+          <div
+            style={{
+              backgroundColor: "#FFEBE9",
+              border: "1px solid #FFCCD1",
+              borderRadius: "6px",
+              padding: "16px",
+              marginBottom: "20px",
+            }}
+          >
+            <Typography.Paragraph
+              style={{
+                margin: 0,
+                fontSize: "14px",
+                color: "#24292f",
+                lineHeight: "1.5",
+              }}
+            >
+              <strong style={{ color: "#cf222e" }}>
+                {t("common.warning")}:
+              </strong>{" "}
+              {t("common.deleteGroupWarning")}
+            </Typography.Paragraph>
+            {groupToDelete && hasCertificates(groupToDelete.id) && (
+              <Typography.Paragraph
+                style={{
+                  marginTop: "8px",
+                  fontSize: "14px",
+                  color: "#cf222e",
+                  lineHeight: "1.5",
+                  fontWeight: 500,
+                }}
+              >
+                {t("common.deleteCertificatesWarning")}
+              </Typography.Paragraph>
+            )}
+          </div>
+
+          <div style={{ marginBottom: "10px" }}>
+            <Typography.Text
+              strong
+              style={{ fontSize: "14px", color: "#24292f", display: "block" }}
+            >
+              {t("common.pleaseType")}{" "}
+              <span style={{ fontWeight: 600 }}>
+                &ldquo;{groupToDelete?.groupName}&rdquo;
+              </span>{" "}
+              {t("common.toConfirm")}
+            </Typography.Text>
+          </div>
+
+          <Input
+            value={confirmGroupName}
+            onChange={(e) => setConfirmGroupName(e.target.value)}
+            placeholder={groupToDelete?.groupName}
+            style={{
+              width: "100%",
+              padding: "5px 12px",
+              fontSize: "14px",
+              border:
+                confirmGroupName === groupToDelete?.groupName
+                  ? "1px solid #2da44e"
+                  : confirmGroupName &&
+                      confirmGroupName !== groupToDelete?.groupName
+                    ? "1px solid #cf222e"
+                    : "1px solid #d0d7de",
+              borderRadius: "6px",
+              boxShadow: "inset 0 1px 0 rgba(208, 215, 222, 0.2)",
+              background:
+                confirmGroupName === groupToDelete?.groupName
+                  ? "rgba(45, 164, 78, 0.05)"
+                  : confirmGroupName &&
+                      confirmGroupName !== groupToDelete?.groupName
+                    ? "rgba(207, 34, 46, 0.05)"
+                    : "white",
+            }}
+            status={
+              confirmGroupName && confirmGroupName !== groupToDelete?.groupName
+                ? "error"
+                : ""
+            }
+          />
+          {confirmGroupName &&
+            confirmGroupName !== groupToDelete?.groupName && (
+              <Typography.Text
+                type="danger"
+                style={{ fontSize: "12px", marginTop: "4px", display: "block" }}
+              >
+                {t("common.nameDoesNotMatch")}
+              </Typography.Text>
+            )}
+        </div>
       </Modal>
 
       <style jsx global>{`

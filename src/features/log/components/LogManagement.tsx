@@ -10,6 +10,7 @@ import {
   Tag,
   Button,
   message,
+  Tooltip,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useSystemLogs, useAllLogs } from "@/services/LogService";
@@ -66,7 +67,7 @@ const LogManagement: React.FC = () => {
       const csvData = exportData.map((log) => [
         log.username,
         log.action.replace(/_/g, " ").toLowerCase(),
-        formatPayload(log.payload),
+        JSON.stringify(log.payload).replace(/"/g, '""'),
         log.role.replace(/_/g, " "),
         format(new Date(log.timestamp), "dd/MM/yyyy HH:mm:ss"),
       ]);
@@ -76,7 +77,10 @@ const LogManagement: React.FC = () => {
         ...csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")),
       ].join("\n");
 
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const BOM = new Uint8Array([0xef, 0xbb, 0xbf]);
+      const blob = new Blob([BOM, csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
@@ -89,9 +93,9 @@ const LogManagement: React.FC = () => {
       document.body.removeChild(link);
 
       message.success({ content: t("logs.exportSuccess"), key: "export" });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       message.error({ content: t("logs.exportError"), key: "export" });
-      console.error("Export error:", error);
     } finally {
       setIsExporting(false);
     }
@@ -119,8 +123,27 @@ const LogManagement: React.FC = () => {
       title: t("logs.payload"),
       dataIndex: "payload",
       key: "payload",
-      render: formatPayload,
-      ellipsis: true,
+      render: (text: string) => {
+        const formattedText = formatPayload(text);
+        return (
+          <Tooltip
+            title={formattedText}
+            placement="top"
+            classNames={{ root: "payload-tooltip" }}
+            styles={{
+              root: { maxWidth: "800px", minWidth: "300px" },
+              body: { padding: "10px", fontSize: "14px" },
+            }}
+          >
+            <Typography.Paragraph
+              ellipsis={{ rows: 2 }}
+              style={{ marginBottom: 0, cursor: "pointer" }}
+            >
+              {formattedText}
+            </Typography.Paragraph>
+          </Tooltip>
+        );
+      },
     },
     {
       title: t("logs.role"),

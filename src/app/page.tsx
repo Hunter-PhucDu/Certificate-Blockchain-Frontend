@@ -1,33 +1,35 @@
 "use client";
 
-import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Loader from "@/components/Elements/Loader";
+import { isMainDomain } from "@/config/constants/hosts";
+const LandingPage = dynamic(
+  () => import("@/features/LandingPage/LandingPage"),
+  {
+    loading: () => <Loader />,
+    ssr: false,
+  },
+);
+
+const LandingPageOrg = dynamic(
+  () => import("@/features/LandingPage/LandingPageOrg"),
+  {
+    loading: () => <Loader />,
+    ssr: false,
+  },
+);
 
 export default function Page() {
-  const router = useRouter();
-  const { isAuthenticated, isLoading, initializeFromStorage, setLoading } =
-    useAuthStore();
-  const [key, setKey] = useState(0);
+  const [isMain, setIsMain] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    initializeFromStorage();
-    setKey((prev) => prev + 1);
-  }, [initializeFromStorage, setLoading]);
+    const main = isMainDomain();
+    setIsMain(main);
+  }, []);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        console.log("RootPage: redirecting to home");
-        router.push("/home");
-      } else {
-        console.log("RootPage: redirecting to login");
-        router.push("/login");
-      }
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  return <Loader key={`loader-${key}`} />;
+  if (isMain === null) {
+    return <Loader />;
+  }
+  return isMain ? <LandingPage /> : <LandingPageOrg />;
 }

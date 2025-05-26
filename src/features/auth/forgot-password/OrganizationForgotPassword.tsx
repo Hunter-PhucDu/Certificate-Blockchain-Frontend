@@ -3,10 +3,9 @@
 
 import React, { useState } from "react";
 import "@ant-design/v5-patch-for-react-19";
-import { Form, Input, Button, Card, Typography, Steps } from "antd";
+import { Form, Input, Button, Card, Typography, Steps, Col } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import {
   OtpForgotPasswordRequestDto,
   useOrganizationGetOtpForgotPassword,
@@ -14,6 +13,8 @@ import {
 } from "@/services/AuthService";
 import OtpInputComponent from "@/components/Elements/OtpInput";
 import { useToast } from "@/components/Elements/Toast";
+import { BlockchainBackground } from "@/components/BlockchainUI";
+import styled from "@emotion/styled";
 
 const { Title, Paragraph } = Typography;
 
@@ -28,8 +29,39 @@ const steps = [
   },
 ];
 
+const StyledCard = styled(Card)`
+  width: 100%;
+  max-width: 450px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+  }
+
+  .ant-card-body {
+    padding: 2rem;
+  }
+`;
+
+const FormCol = styled(Col)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+`;
+
 const OrganizationForgotPasswordPage = () => {
-  const { t } = useTranslation();
   const router = useRouter();
   const [emailForm] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
@@ -87,13 +119,14 @@ const OrganizationForgotPasswordPage = () => {
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: t("common.emailRequired") },
-                { type: "email", message: t("common.invalidEmail") },
+                { required: true, message: "Email là bắt buộc" },
+                { type: "email", message: "Email không hợp lệ" },
               ]}
+              style={{ marginBottom: 30 }}
             >
               <Input
                 prefix={<MailOutlined />}
-                placeholder={t("common.email")}
+                placeholder={"Email"}
                 size="large"
               />
             </Form.Item>
@@ -106,13 +139,13 @@ const OrganizationForgotPasswordPage = () => {
                 block
                 loading={getOtpMutation.isPending}
               >
-                {t("common.sendOtp")}
+                {"Gửi mã OTP"}
               </Button>
             </Form.Item>
 
             <Form.Item>
               <Button type="link" block onClick={() => router.push("/login")}>
-                {t("common.backToLogin")}
+                {"Quay lại đăng nhập"}
               </Button>
             </Form.Item>
           </Form>
@@ -127,7 +160,7 @@ const OrganizationForgotPasswordPage = () => {
               isDisabled={sendLinkMutation.isPending}
             />
 
-            <Form.Item>
+            <Form.Item style={{ marginTop: "20px" }}>
               <Button
                 type="primary"
                 size="large"
@@ -135,7 +168,7 @@ const OrganizationForgotPasswordPage = () => {
                 loading={sendLinkMutation.isPending}
                 onClick={handleVerifyOtp}
               >
-                {t("common.sendResetLink")}
+                {"Gửi liên kết khôi phục mật khẩu"}
               </Button>
             </Form.Item>
           </div>
@@ -146,22 +179,24 @@ const OrganizationForgotPasswordPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-5">
-      <Card className="w-full max-w-[450px]">
-        <div className="text-center mb-6">
-          <Title level={2} className="mb-2 font-semibold">
-            {t("common.forgotPassword")}
-          </Title>
-          <Paragraph type="secondary">
-            Khôi phục mật khẩu tổ chức của bạn
-          </Paragraph>
-        </div>
+    <BlockchainBackground tagline="Hệ thống xác thực chứng chỉ blockchain dành cho tổ chức giáo dục và doanh nghiệp">
+      <FormCol>
+        <StyledCard>
+          <div className="text-center mb-6">
+            <Title level={2} className="mb-2 font-semibold">
+              Quên mật khẩu
+            </Title>
+            <Paragraph type="secondary">
+              Khôi phục mật khẩu tổ chức của bạn
+            </Paragraph>
+          </div>
 
-        <Steps current={currentStep} items={steps} className="mb-16" />
+          <Steps current={currentStep} items={steps} className="mb-8" />
 
-        <div className="mt-8">{renderStepContent()}</div>
-      </Card>
-    </div>
+          <div className="mt-8">{renderStepContent()}</div>
+        </StyledCard>
+      </FormCol>
+    </BlockchainBackground>
   );
 };
 

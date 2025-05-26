@@ -57,10 +57,7 @@ const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  useEffect(() => {
-    console.log("Reset Password Page Mounted");
-    console.log("Token:", token);
-  }, [token]);
+  useEffect(() => {}, [token]);
 
   const resetPasswordMutation = useResetPasswordWithToken();
 

@@ -60,7 +60,7 @@ axiosInstance.interceptors.response.use(
           .catch((e) => {
             processQueue(e, null);
             auth.clearAuth();
-            window.location.href = "/login";
+            // window.location.href = "/";
             reject(e);
           })
           .finally(() => {
