@@ -10,6 +10,7 @@ import {
   Tag,
   Button,
   message,
+  Tooltip,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useSystemLogs, useAllLogs } from "@/services/LogService";
@@ -92,9 +93,9 @@ const LogManagement: React.FC = () => {
       document.body.removeChild(link);
 
       message.success({ content: t("logs.exportSuccess"), key: "export" });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       message.error({ content: t("logs.exportError"), key: "export" });
-      console.error("Export error:", error);
     } finally {
       setIsExporting(false);
     }
@@ -125,20 +126,22 @@ const LogManagement: React.FC = () => {
       render: (text: string) => {
         const formattedText = formatPayload(text);
         return (
-          <Typography.Paragraph
-            ellipsis={{
-              rows: 2,
-              tooltip: {
-                title: formattedText,
-                placement: "topLeft",
-                overlayStyle: { maxWidth: "800px", minWidth: "300px" },
-                overlayInnerStyle: { padding: "10px", fontSize: "14px" },
-              },
+          <Tooltip
+            title={formattedText}
+            placement="top"
+            classNames={{ root: "payload-tooltip" }}
+            styles={{
+              root: { maxWidth: "800px", minWidth: "300px" },
+              body: { padding: "10px", fontSize: "14px" },
             }}
-            style={{ marginBottom: 0 }}
           >
-            {formattedText}
-          </Typography.Paragraph>
+            <Typography.Paragraph
+              ellipsis={{ rows: 2 }}
+              style={{ marginBottom: 0, cursor: "pointer" }}
+            >
+              {formattedText}
+            </Typography.Paragraph>
+          </Tooltip>
         );
       },
     },

@@ -152,7 +152,10 @@ export const CertificateService = {
 
 // React Query hooks
 export const useCertificates = (params?: CertificateListParams) => {
-  return useQuery({
+  return useQuery<
+    PaginatedResponse<Certificate> | ApiResponse<Certificate[]>,
+    Error
+  >({
     queryKey: ["certificates", params],
     queryFn: () =>
       params

@@ -98,9 +98,9 @@ const Settings = () => {
 
       await updateProfileMutation.mutateAsync(formData);
       message.success(t("common.organizations.updateSuccess"));
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       message.error(t("common.organizations.error"));
-      console.error("Failed to update profile:", error);
     }
   };
 

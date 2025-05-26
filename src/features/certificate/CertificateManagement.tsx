@@ -70,7 +70,7 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
   const [previewData, setPreviewData] = useState<Record<string, any>>({});
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 12,
   });
 
   const certificateParams: CertificateListParams = {
@@ -216,8 +216,8 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
       document.body.removeChild(link);
 
       messageApi.success(t("common.certificates.exportSuccess"));
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Export error:", error);
       messageApi.error(t("common.certificates.exportError"));
     }
   };
@@ -352,13 +352,13 @@ const CertificateManagement: React.FC<CertificateManagementProps> = ({
         rowKey="id"
         pagination={{
           current: pagination.current,
-          pageSize: 10,
+          pageSize: 12,
           showSizeChanger: false,
           showTotal: (total) => t("common.pagination.showTotal", { total }),
           onChange: (page) => {
             setPagination({
               current: page,
-              pageSize: 10,
+              pageSize: 12,
             });
           },
           total: totalItems,

@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Certificate Blockchain",
   description: "A blockchain-based certificate management system",
+  icons: {
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    apple: [{ url: "/favicon.ico", sizes: "any" }],
+  },
 };
 
 export default function RootLayout({
@@ -30,6 +34,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
         />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <script
           async
           defer

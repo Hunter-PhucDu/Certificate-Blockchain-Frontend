@@ -43,9 +43,9 @@ const PasswordChangeForm = () => {
 
       message.success("Cập nhật mật khẩu thành công");
       form.resetFields();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       message.error(t("common.changePassword.error"));
-      console.error("Failed to change password:", error);
     }
   };
 

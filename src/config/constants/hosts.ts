@@ -2,8 +2,6 @@
 
 const HOSTNAME = process.env.NEXT_PUBLIC_HOSTNAME_URL || "localhost";
 
-console.log("HOSTNAME", HOSTNAME);
-
 export const isAllowedHostname = (): boolean => {
   if (typeof window === "undefined") return false;
 

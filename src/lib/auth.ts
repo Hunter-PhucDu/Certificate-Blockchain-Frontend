@@ -15,8 +15,8 @@ export const getTokenData = (token: string | null): JWTPayload | null => {
 
   try {
     return jwtDecode<JWTPayload>(token);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error("Failed to decode token:", error);
     return null;
   }
 };
@@ -29,8 +29,8 @@ export const isTokenExpired = (token: string | null): boolean => {
     const currentTime = Date.now() / 1000;
 
     return decoded.exp < currentTime;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error("Failed to check token expiration:", error);
     return true;
   }
 };
@@ -41,8 +41,8 @@ export const getUserRoleFromToken = (token: string | null): string | null => {
   try {
     const decoded = jwtDecode<JWTPayload>(token);
     return decoded.role || null;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error("Failed to get user role from token:", error);
     return null;
   }
 };
