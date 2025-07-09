@@ -467,24 +467,64 @@ export default function LandingPage() {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 15px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
             <SafetyCertificateOutlined
-              style={{ fontSize: 24, color: "white", marginRight: 12 }}
+              style={{
+                fontSize: 24,
+                color: "white",
+                marginRight: 12,
+                flexShrink: 0,
+              }}
             />
-            <Text strong style={{ color: "white", fontSize: 18 }}>
+            <Text
+              strong
+              style={{
+                color: "white",
+                fontSize: 18,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               Authenticate.io.vn
             </Text>
           </div>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button type="link" style={{ color: "white" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "8px",
+            }}
+            className="desktop-nav"
+          >
+            <Button
+              type="link"
+              style={{ color: "white", padding: "0 8px", fontSize: "14px" }}
+            >
               Về Chúng Tôi
             </Button>
-            <Button type="link" style={{ color: "white" }}>
+            <Button
+              type="link"
+              style={{ color: "white", padding: "0 8px", fontSize: "14px" }}
+            >
               Công Nghệ
             </Button>
-            <Button type="link" style={{ color: "white" }}>
+            <Button
+              type="link"
+              style={{ color: "white", padding: "0 8px", fontSize: "14px" }}
+            >
               Đối Tác
             </Button>
           </div>
@@ -492,6 +532,88 @@ export default function LandingPage() {
       </StyledHeader>
 
       <Content style={{ paddingTop: "80px" }}>
+        <style jsx global>{`
+          @media (max-width: 768px) {
+            .desktop-nav {
+              display: none !important;
+            }
+
+            .ant-layout-header {
+              height: 70px !important;
+              padding: 0 15px !important;
+            }
+
+            .ant-layout-content {
+              padding-top: 70px !important;
+            }
+
+            .ant-typography h1 {
+              font-size: 28px !important;
+              line-height: 1.2 !important;
+            }
+
+            .ant-typography h2 {
+              font-size: 24px !important;
+            }
+
+            .ant-typography h3 {
+              font-size: 20px !important;
+            }
+
+            .search-section {
+              margin: 0 10px !important;
+              padding: 20px 15px !important;
+            }
+
+            .features-section {
+              padding: 40px 15px !important;
+            }
+
+            .process-section {
+              padding: 40px 15px !important;
+            }
+          }
+
+          @media (max-width: 576px) {
+            .ant-layout-header {
+              height: 65px !important;
+              padding: 0 10px !important;
+            }
+
+            .ant-layout-content {
+              padding-top: 65px !important;
+            }
+
+            .ant-typography h1 {
+              font-size: 24px !important;
+            }
+
+            .ant-typography h2 {
+              font-size: 22px !important;
+            }
+
+            .ant-typography h3 {
+              font-size: 18px !important;
+            }
+
+            .ant-btn {
+              font-size: 14px !important;
+            }
+
+            .ant-col {
+              padding: 0 8px !important;
+            }
+
+            .ant-row {
+              margin: 0 -8px !important;
+            }
+
+            .search-section {
+              margin: 0 5px !important;
+              padding: 15px 10px !important;
+            }
+          }
+        `}</style>
         <HeroSection
           style={{
             background:
@@ -761,7 +883,7 @@ export default function LandingPage() {
           </HeroContent>
         </HeroSection>
 
-        <SearchSection>
+        <SearchSection className="search-section">
           <Title level={3} style={{ textAlign: "center", marginBottom: 16 }}>
             Tìm Kiếm Tổ Chức
           </Title>
@@ -846,8 +968,11 @@ export default function LandingPage() {
           </SearchContainer>
         </SearchSection>
 
-        <div style={{ padding: "100px 50px", background: "#f7fafc" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div
+          className="features-section"
+          style={{ padding: "100px 50px", background: "#f7fafc" }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 15px" }}>
             <Title level={2} style={{ textAlign: "center", marginBottom: 16 }}>
               Tại Sao Chọn authenticate.io.vn
             </Title>
@@ -963,8 +1088,8 @@ export default function LandingPage() {
 
         <ProcessSection>
           <div
-            className="process-container"
-            style={{ maxWidth: 1200, margin: "0 auto", padding: "0 50px" }}
+            className="process-container process-section"
+            style={{ maxWidth: 1200, margin: "0 auto", padding: "0 15px" }}
           >
             <Title level={2} style={{ textAlign: "center", marginBottom: 16 }}>
               Quy Trình Hoạt Động
@@ -1053,7 +1178,7 @@ export default function LandingPage() {
         </ProcessSection>
 
         <EnhancedAnimatedBox>
-          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 15px" }}>
             <Row align="middle" gutter={[32, 32]}>
               <Col xs={24} md={16}>
                 <Title level={2} style={{ color: "white", marginBottom: 16 }}>
@@ -1106,7 +1231,7 @@ export default function LandingPage() {
       </Content>
 
       <StyledFooter>
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 15px" }}>
           <Row gutter={[32, 32]}>
             <Col xs={24} md={8}>
               <Title level={4} style={{ color: "white" }}>

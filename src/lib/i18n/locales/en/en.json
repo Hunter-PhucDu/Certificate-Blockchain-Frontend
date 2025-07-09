@@ -115,6 +115,8 @@
     },
     "organizations": {
       "title": "Organization Management",
+      "tenant": "Tenant",
+      "selectTenant": "Select Tenant",
       "list": "Organization List",
       "create": "Create Organization",
       "edit": "Edit Organization",
@@ -130,7 +132,9 @@
       "createSuccess": "Organization created successfully",
       "updateSuccess": "Organization updated successfully",
       "deleteSuccess": "Organization deleted successfully",
-      "error": "An error occurred"
+      "error": "An error occurred",
+      "resetPassword": "Reset Password",
+      "unlockAccount": "Unlock Account"
     },
     "documents": "Documents",
     "settings": "Settings",
