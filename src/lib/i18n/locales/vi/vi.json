@@ -115,6 +115,8 @@
     },
     "organizations": {
       "title": "Quản lý Tổ chức",
+      "tenant": "Tổ chức",
+      "selectTenant": "Chọn Tổ chức",
       "list": "Danh sách Tổ chức",
       "create": "Tạo Tổ chức mới",
       "edit": "Chỉnh sửa Tổ chức",
@@ -130,7 +132,9 @@
       "createSuccess": "Tạo tổ chức thành công",
       "updateSuccess": "Cập nhật tổ chức thành công",
       "deleteSuccess": "Xóa tổ chức thành công",
-      "error": "Có lỗi xảy ra"
+      "error": "Có lỗi xảy ra",
+      "resetPassword": "Đặt lại mật khẩu",
+      "unlockAccount": "Mở khóa tài khoản"
     },
     "documents": "Tài liệu",
     "settings": "Cài đặt",

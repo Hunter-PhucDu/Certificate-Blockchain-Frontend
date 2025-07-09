@@ -218,8 +218,8 @@ export default function LandingPageOrg() {
       <Header
         style={{
           background: "#1a365d",
-          padding: "0 20px",
-          height: "80px",
+          padding: "0 15px",
+          height: "70px",
           position: "fixed",
           width: "100%",
           zIndex: 1000,
@@ -237,29 +237,52 @@ export default function LandingPageOrg() {
             width: "100%",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
             <SafetyCertificateOutlined
-              style={{ fontSize: 24, color: "#60a5fa", marginRight: 8 }}
+              style={{
+                fontSize: 20,
+                color: "#60a5fa",
+                marginRight: 8,
+                flexShrink: 0,
+              }}
             />
             <Text
               strong
-              style={{ color: "white", fontSize: 16, whiteSpace: "nowrap" }}
+              className="header-text"
+              style={{
+                color: "white",
+                fontSize: 14,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
             >
-              {organizationName} | Authenticate.io.vn
+              <span className="desktop-only">
+                {organizationName} | Authenticate.io.vn
+              </span>
+              <span className="mobile-hidden">{organizationName}</span>
             </Text>
           </div>
-          <div>
+          <div style={{ flexShrink: 0 }}>
             <Link href="/login">
               <Button
                 type="primary"
-                size="middle"
+                size="small"
                 style={{
                   background:
                     "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
                   border: "none",
-                  height: "38px",
-                  padding: "0 20px",
-                  borderRadius: "19px",
+                  height: "32px",
+                  padding: "0 16px",
+                  borderRadius: "16px",
+                  fontSize: "14px",
                   boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
                 }}
               >
@@ -270,7 +293,78 @@ export default function LandingPageOrg() {
         </div>
       </Header>
 
-      <Content style={{ paddingTop: "80px" }}>
+      <Content style={{ paddingTop: "70px" }}>
+        <style jsx global>{`
+          @media (min-width: 768px) {
+            .header-text .desktop-only {
+              display: inline !important;
+            }
+            .header-text .mobile-hidden {
+              display: none !important;
+            }
+          }
+
+          @media (max-width: 767px) {
+            .header-text .desktop-only {
+              display: none !important;
+            }
+            .header-text .mobile-hidden {
+              display: inline !important;
+            }
+
+            .ant-typography h1 {
+              font-size: 28px !important;
+              line-height: 1.2 !important;
+            }
+
+            .ant-typography h3 {
+              font-size: 20px !important;
+            }
+
+            .ant-typography h4 {
+              font-size: 18px !important;
+            }
+
+            .ant-input-lg {
+              font-size: 16px !important;
+            }
+
+            .ant-btn-lg {
+              font-size: 16px !important;
+            }
+
+            .certificate-card {
+              margin: 0 10px !important;
+            }
+
+            .feature-section {
+              padding: 40px 15px !important;
+            }
+
+            .search-section {
+              padding: 20px 15px !important;
+              margin: 0 10px !important;
+            }
+          }
+
+          @media (max-width: 576px) {
+            .ant-typography h1 {
+              font-size: 24px !important;
+            }
+
+            .ant-typography h3 {
+              font-size: 18px !important;
+            }
+
+            .ant-col {
+              padding: 0 8px !important;
+            }
+
+            .ant-row {
+              margin: 0 -8px !important;
+            }
+          }
+        `}</style>
         <HeroSection
           style={{
             background:
@@ -510,7 +604,7 @@ export default function LandingPageOrg() {
           </HeroContent>
         </HeroSection>
 
-        <SearchSection>
+        <SearchSection className="search-section">
           <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
             <ScanOutlined style={{ marginRight: 12, color: "#3b82f6" }} />
             Xác Thực Chứng Chỉ
@@ -577,7 +671,7 @@ export default function LandingPageOrg() {
             !isError &&
             certificateData?.data &&
             certificateData.data.length > 0 && (
-              <CertificateCard>
+              <CertificateCard className="certificate-card">
                 <CertificateHeader>
                   <FileDoneOutlined style={{ fontSize: 36 }} />
                   <Title
@@ -653,109 +747,116 @@ export default function LandingPageOrg() {
           )}
         </SearchSection>
 
-        <FeatureSection style={{ background: getBackgroundColor() }}>
-          <Row gutter={[32, 32]}>
-            <Col xs={24} md={8}>
-              <FeatureCard
-                title={
-                  <div style={{ textAlign: "center" }}>
-                    <div className="icon-wrapper">
-                      <SafetyCertificateOutlined
-                        style={{
-                          fontSize: 32,
-                          marginBottom: 16,
-                          color: "#3b82f6",
-                        }}
-                      />
+        <FeatureSection
+          className="feature-section"
+          style={{ background: getBackgroundColor() }}
+        >
+          <div
+            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 15px" }}
+          >
+            <Row gutter={[32, 32]}>
+              <Col xs={24} md={8}>
+                <FeatureCard
+                  title={
+                    <div style={{ textAlign: "center" }}>
+                      <div className="icon-wrapper">
+                        <SafetyCertificateOutlined
+                          style={{
+                            fontSize: 32,
+                            marginBottom: 16,
+                            color: "#3b82f6",
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: 20, fontWeight: 500 }}>
+                        Uy Tín và Bảo Mật
+                      </div>
                     </div>
-                    <div style={{ fontSize: 20, fontWeight: 500 }}>
-                      Uy Tín và Bảo Mật
-                    </div>
-                  </div>
-                }
-              >
-                <Paragraph
-                  style={{
-                    textAlign: "center",
-                    fontSize: 16,
-                    color: "#64748b",
-                  }}
+                  }
                 >
-                  Chứng chỉ được xác thực trên blockchain, đảm bảo tính chính
-                  xác và không thể làm giả.
-                </Paragraph>
-              </FeatureCard>
-            </Col>
+                  <Paragraph
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "#64748b",
+                    }}
+                  >
+                    Chứng chỉ được xác thực trên blockchain, đảm bảo tính chính
+                    xác và không thể làm giả.
+                  </Paragraph>
+                </FeatureCard>
+              </Col>
 
-            <Col xs={24} md={8}>
-              <FeatureCard
-                title={
-                  <div style={{ textAlign: "center" }}>
-                    <div className="icon-wrapper">
-                      <BlockOutlined
-                        style={{
-                          fontSize: 32,
-                          marginBottom: 16,
-                          color: "#3b82f6",
-                        }}
-                      />
+              <Col xs={24} md={8}>
+                <FeatureCard
+                  title={
+                    <div style={{ textAlign: "center" }}>
+                      <div className="icon-wrapper">
+                        <BlockOutlined
+                          style={{
+                            fontSize: 32,
+                            marginBottom: 16,
+                            color: "#3b82f6",
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: 20, fontWeight: 500 }}>
+                        Công Nghệ Blockchain
+                      </div>
                     </div>
-                    <div style={{ fontSize: 20, fontWeight: 500 }}>
-                      Công Nghệ Blockchain
-                    </div>
-                  </div>
-                }
-              >
-                <Paragraph
-                  style={{
-                    textAlign: "center",
-                    fontSize: 16,
-                    color: "#64748b",
-                  }}
+                  }
                 >
-                  Sử dụng công nghệ phân tán giúp minh bạch hóa quy trình cấp và
-                  xác thực chứng chỉ.
-                </Paragraph>
-              </FeatureCard>
-            </Col>
+                  <Paragraph
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "#64748b",
+                    }}
+                  >
+                    Sử dụng công nghệ phân tán giúp minh bạch hóa quy trình cấp
+                    và xác thực chứng chỉ.
+                  </Paragraph>
+                </FeatureCard>
+              </Col>
 
-            <Col xs={24} md={8}>
-              <FeatureCard
-                title={
-                  <div style={{ textAlign: "center" }}>
-                    <div className="icon-wrapper">
-                      <ScanOutlined
-                        style={{
-                          fontSize: 32,
-                          marginBottom: 16,
-                          color: "#3b82f6",
-                        }}
-                      />
+              <Col xs={24} md={8}>
+                <FeatureCard
+                  title={
+                    <div style={{ textAlign: "center" }}>
+                      <div className="icon-wrapper">
+                        <ScanOutlined
+                          style={{
+                            fontSize: 32,
+                            marginBottom: 16,
+                            color: "#3b82f6",
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: 20, fontWeight: 500 }}>
+                        Xác Thực Ngay Lập Tức
+                      </div>
                     </div>
-                    <div style={{ fontSize: 20, fontWeight: 500 }}>
-                      Xác Thực Ngay Lập Tức
-                    </div>
-                  </div>
-                }
-              >
-                <Paragraph
-                  style={{
-                    textAlign: "center",
-                    fontSize: 16,
-                    color: "#64748b",
-                  }}
+                  }
                 >
-                  Tra cứu và xác thực chứng chỉ ngay lập tức, mọi lúc mọi nơi
-                  với kết quả chính xác.
-                </Paragraph>
-              </FeatureCard>
-            </Col>
-          </Row>
+                  <Paragraph
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "#64748b",
+                    }}
+                  >
+                    Tra cứu và xác thực chứng chỉ ngay lập tức, mọi lúc mọi nơi
+                    với kết quả chính xác.
+                  </Paragraph>
+                </FeatureCard>{" "}
+              </Col>
+            </Row>
+          </div>
         </FeatureSection>
       </Content>
 
       <StyledFooter>
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 15px" }}>
           <Row gutter={[32, 32]}>
             <Col xs={24} md={8}>
               <Title level={4} style={{ color: "white" }}>
